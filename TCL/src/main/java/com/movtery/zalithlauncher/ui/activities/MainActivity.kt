@@ -788,11 +788,18 @@ class MainActivity : BaseAppCompatActivity() {
                 )
             )
         }
+        val metrics = resources.displayMetrics
+        // Controls are normally edited and used in landscape. Convert against the
+        // current device instead of inventing an authoring-device resolution.
+        val screenWidth = maxOf(metrics.widthPixels, metrics.heightPixels)
+        val screenHeight = minOf(metrics.widthPixels, metrics.heightPixels)
+        val density = metrics.density
         TaskSystem.submitTask(
             Task.runTask(
                 dispatcher = Dispatchers.IO,
                 task = {
                     var done = false
+                    val importWarnings = mutableListOf<String>()
                     uris.forEach { uri ->
                         val inputStream = contentResolver.openInputStream(uri) ?: run {
                             showError(message = androidText(R.string.multirt_runtime_import_failed_input_stream))
@@ -812,19 +819,29 @@ class MainActivity : BaseAppCompatActivity() {
                             catchedError =  {
                                 showError(message = androidText(it.getMessageOrToString()))
                             },
-                            onFinished = {
+                            screenWidth = screenWidth,
+                            screenHeight = screenHeight,
+                            screenDensity = density,
+                            onFinished = { warnings ->
                                 done = true
+                                if (warnings.isNotEmpty()) {
+                                    importWarnings += "${uri.lastPathSegment ?: "Layout"}:\n" + warnings.joinToString("\n") { "• $it" }
+                                }
                             }
                         )
                     }
                     ControlManager.refresh()
                     if (done) {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                getString(R.string.generic_done),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            if (importWarnings.isNotEmpty()) {
+                                MaterialAlertDialogBuilder(this@MainActivity)
+                                    .setTitle(R.string.control_import_notes)
+                                    .setMessage(importWarnings.joinToString("\n\n"))
+                                    .setPositiveButton(android.R.string.ok, null)
+                                    .showThemed()
+                            } else {
+                                Toast.makeText(this@MainActivity, getString(R.string.generic_done), Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
