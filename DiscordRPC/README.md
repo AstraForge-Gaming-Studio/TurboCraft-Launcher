@@ -1,7 +1,7 @@
 # Discord Rich Presence
 
 启动器在前台运行时，在 Discord 个人资料里显示 **“正在玩 TurboCraft Launcher”**，附带
-“开始时间”计时器和最多两个按钮（Download / Join Discord）。
+“开始时间”计时器和最多两个按钮（下载 / GitHub）。
 
 不使用 Discord 机器人、不需要任何账号令牌或 OAuth：只通过 **Discord Social SDK** 的
 本地 RPC 通道，把状态发给**同一台手机上已登录的 Discord 客户端**。
@@ -18,7 +18,7 @@
 | `TITLE` | Discord 卡片标题，默认 `TurboCraft Launcher`（不设置会显示成 “Game”） |
 | `DETAILS` / `STATE` | 卡片上的两行文案（留空则该行不显示），默认第二行是 `Minecraft Java Edition` |
 | `PRIMARY_BUTTON_LABEL` / `PRIMARY_BUTTON_URL` | 第一个按钮，默认 “Download” → GitHub Releases |
-| `SECONDARY_BUTTON_LABEL` / `SECONDARY_BUTTON_URL` | 第二个按钮，默认 “Join Discord” → Discord 邀请链接 |
+| `SECONDARY_BUTTON_LABEL` / `SECONDARY_BUTTON_URL` | 第二个按钮，默认 “GitHub” → 仓库主页 |
 
 改完重新打包即可生效。
 

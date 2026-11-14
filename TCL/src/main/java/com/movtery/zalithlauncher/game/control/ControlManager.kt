@@ -26,10 +26,6 @@ import com.movtery.layer_controller.layout.loadLayoutFromString
 import com.movtery.layer_controller.observable.ObservableControlLayout
 import com.movtery.layer_controller.utils.newRandomFileName
 import com.movtery.layer_controller.utils.saveToFile
-import com.movtery.zalithlauncher.game.control.importer.ImportScreen
-import com.movtery.zalithlauncher.game.control.importer.PojavImporter
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import com.movtery.zalithlauncher.context.copyAssetFile
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -215,24 +211,16 @@ object ControlManager {
         inputStream: InputStream,
         onSerializationError: (Exception) -> Unit,
         catchedError: (Exception) -> Unit,
-        screenWidth: Int,
-        screenHeight: Int,
-        screenDensity: Float,
-        onFinished: (List<String>) -> Unit = {},
+        onFinished: () -> Unit = {},
     ) = withContext(Dispatchers.IO) {
         val file = getNewRandomFile()
         try {
             inputStream.use { stream ->
                 val jsonString = stream.readString()
-                val root = Json.parseToJsonElement(jsonString) as? JsonObject
-                    ?: throw SerializationException("Control layout must be a JSON object")
-                val result = if (PojavImporter.matches(root)) {
-                    PojavImporter.convert(root, ImportScreen(screenWidth, screenHeight, screenDensity))
-                } else null
-                val layout = result?.layout ?: loadLayoutFromString(jsonString)
+                val layout = loadLayoutFromString(jsonString)
                 layout.saveToFile(file)
-                onFinished(result?.warnings ?: emptyList())
             }
+            onFinished()
         } catch (e: SerializationException) {
             FileUtils.deleteQuietly(file)
             onSerializationError(e)

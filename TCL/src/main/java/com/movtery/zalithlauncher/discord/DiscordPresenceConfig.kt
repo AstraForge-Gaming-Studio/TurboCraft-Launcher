@@ -62,6 +62,6 @@ object DiscordPresenceConfig {
     /**
      * 第二个按钮：文字 + 链接（Discord 最多允许 2 个按钮）。
      */
-    const val SECONDARY_BUTTON_LABEL = "Join Discord"
-    const val SECONDARY_BUTTON_URL = "https://discord.gg/bwkpJZB6NS"
+    const val SECONDARY_BUTTON_LABEL = "GitHub"
+    const val SECONDARY_BUTTON_URL = "https://github.com/TCL-Team/TurboCraft-Launcher"
 }
