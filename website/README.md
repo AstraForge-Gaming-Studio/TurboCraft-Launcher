@@ -7,6 +7,12 @@ static host (for example GitHub Pages) or preview it locally:
 python3 -m http.server 8000 --directory website
 ```
 
-The download buttons lead to the GitHub Releases listing so both stable and
-pre-release builds can be found. The Discord invite is configured in
-`index.html`. Update both links there if they ever change.
+APK buttons directly download GitHub Release assets. The page works without
+JavaScript using the verified v1.6 links in `index.html`. With JavaScript, it
+queries the public GitHub Releases API and selects the newest published
+versioned release (including pre-releases) that contains all five APKs and
+`SHA256SUMS.txt`. Rolling preview builds and incomplete releases are skipped;
+all displayed links and sizes come from the same release. If the API is
+unavailable, rate-limited or blocked, the v1.6 fallback stays in place. Update
+the fallback links in `index.html` when appropriate. The Discord invite is also
+configured in `index.html`.
