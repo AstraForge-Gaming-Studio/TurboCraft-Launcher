@@ -16,3 +16,8 @@ all displayed links and sizes come from the same release. If the API is
 unavailable, rate-limited or blocked, the v1.6 fallback stays in place. Update
 the fallback links in `index.html` when appropriate. The Discord invite is also
 configured in `index.html`.
+
+The `Deploy website to GitHub Pages` workflow publishes this directory on each
+push to `main`. Set the repository's Pages source to **GitHub Actions** before
+running it. The site uses relative asset paths, so it also works under a
+repository Pages URL.
