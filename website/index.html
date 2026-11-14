@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111812">
-  <meta name="description" content="Bring Minecraft: Java Edition to your Android device with TurboCraft Launcher. Your world, your way.">
-  <title>TurboCraft Launcher — Your world, on the move</title>
-  <link rel="icon" type="image/png" href="assets/turbocraft-icon.png">
+  <meta name="theme-color" content="#090e0a">
+  <meta name="description" content="Download TurboCraft Launcher for Android. Take Minecraft: Java Edition wherever you go.">
+  <meta property="og:title" content="TurboCraft Launcher — Your world goes with you">
+  <meta property="og:description" content="Your Minecraft: Java Edition adventure, made for Android.">
+  <title>TurboCraft Launcher — Your world goes with you</title>
+  <link rel="icon" href="assets/turbocraft-icon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,97 +16,63 @@
   <script src="script.js" defer></script>
 </head>
 <body>
-<svg xmlns="http://www.w3.org/2000/svg" class="svg-defs" aria-hidden="true">
-  <symbol id="arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol>
-  <symbol id="arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
-  <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></symbol>
-  <symbol id="spark" viewBox="0 0 24 24"><path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></symbol>
+<svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+  <symbol id="up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol>
+  <symbol id="download-icon" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></symbol>
   <symbol id="layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
   <symbol id="sliders" viewBox="0 0 24 24"><path d="M4 7h9m4 0h3M4 17h3m4 0h9M13 4v6M7 14v6"/></symbol>
-  <symbol id="code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-2-13-4 16"/></symbol>
+  <symbol id="spark" viewBox="0 0 24 24"><path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></symbol>
   <symbol id="phone" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M10 5h4m-3 13h2"/></symbol>
-  <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
   <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
 </svg>
 <header class="site-header" id="top">
   <div class="shell nav-wrap">
-    <a class="brand" href="#top" aria-label="TurboCraft Launcher home">
-      <img src="assets/turbocraft-icon.png" alt="" width="44" height="44">
-      <span>TURBOCRAFT <small>LAUNCHER</small></span>
-    </a>
-    <nav class="desktop-nav" aria-label="Main navigation">
-      <a href="#features">Features</a><a href="#getting-started">Getting started</a><a href="#community">Community</a><a href="#faq">FAQ</a>
-    </nav>
-    <a class="nav-download" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases">Get the launcher <svg><use href="#arrow-up-right"/></svg></a>
+    <a class="brand" href="#top" aria-label="TurboCraft Launcher home"><img src="assets/turbocraft-icon.png" alt="" width="46" height="46"><span>TURBOCRAFT<small>LAUNCHER</small></span></a>
+    <nav class="desktop-nav" aria-label="Main navigation"><a href="#features">Features</a><a href="#download">Downloads</a><a href="#getting-started">Get started</a><a href="#faq">FAQ</a></nav>
+    <a class="nav-download" href="#download">Get TurboCraft <svg><use href="#arrow"/></svg></a>
     <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span></button>
   </div>
-  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden>
-    <a href="#features">Features</a><a href="#getting-started">Getting started</a><a href="#community">Community</a><a href="#faq">FAQ</a><a href="https://github.com/TCL-Team/TurboCraft-Launcher/releases">Get the launcher ↗</a>
-  </nav>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden><a href="#features">Features</a><a href="#download">Downloads</a><a href="#getting-started">Get started</a><a href="#faq">FAQ</a><a href="https://discord.gg/bwkpJZB6NS">Join Discord ↗</a></nav>
 </header>
 <main>
   <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-image" aria-hidden="true"></div>
-    <div class="hero-shade" aria-hidden="true"></div>
-    <div class="shell hero-inner">
-      <div class="hero-copy">
-        <div class="eyebrow light"><span class="live-dot"></span> MADE FOR ANDROID ADVENTURES <span class="eyebrow-line"></span></div>
-        <h1 id="hero-title">Your world.<br><em>On the move.</em></h1>
-        <p>Minecraft: Java Edition, wherever you go. A launcher built for the players who never stop exploring.</p>
-        <div class="hero-actions">
-          <a class="button button-lime" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases"><svg><use href="#download"/></svg> Download for Android <span>↗</span></a>
-          <a class="button button-outline" href="#getting-started">See how it works <svg><use href="#arrow-right"/></svg></a>
-        </div>
-        <div class="hero-meta"><span><svg><use href="#phone"/></svg> ANDROID 8.0+</span><i></i><span>FREE &amp; OPEN SOURCE</span></div>
-      </div>
-      <div class="hero-caption"><span class="caption-cross">✳</span><div><strong>A LITTLE MORE ADVENTURE.</strong><br>Where will you go next?</div><span class="caption-num">01 / 03</span></div>
-      <a class="scroll-cue" href="#features"><span>SCROLL TO EXPLORE</span><span class="scroll-line"></span> ↓</a>
-    </div>
+    <div class="hero-art" aria-hidden="true"></div><div class="hero-overlay" aria-hidden="true"></div>
+    <div class="shell hero-inner"><div class="hero-copy">
+      <a href="#download" class="release-pill"><span class="pulse-dot"></span> <span data-release-label>VERSION 1.6</span> <span class="pill-divider"></span> AVAILABLE FOR ANDROID <svg><use href="#arrow"/></svg></a>
+      <p class="overline hero-overline">YOUR ADVENTURE, UNLOCKED <span>✦</span></p>
+      <h1 id="hero-title">Your world<br><em>goes with you<span>.</span></em></h1>
+      <p class="hero-description">Minecraft: Java Edition on your Android. Your favorite worlds, your own controls, and a whole lot more room to play.</p>
+      <div class="hero-actions"><a class="button button-primary" data-asset="arm64" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/TurboCraft-Launcher-1.6-arm64-v8a.apk"><svg><use href="#download-icon"/></svg><span>Download for Android<small>ARM64 · <span data-size="arm64">204.1 MiB</span></small></span><span class="button-arrow">↘</span></a><a class="button button-ghost" href="#download">Other downloads <svg><use href="#arrow"/></svg></a></div>
+      <div class="hero-meta"><span>ANDROID 8.0+</span><i></i><span>FREE &amp; OPEN SOURCE</span><i></i><span>JAVA EDITION</span></div>
+    </div><div class="hero-aside"><span class="aside-icon">✳</span><div><strong>MADE FOR ADVENTURE</strong><small>Big worlds. No boundaries.</small></div></div><a class="scroll-cue" href="#features"><span>EXPLORE TURBOCRAFT</span><span class="scroll-line"></span> ↓</a></div>
   </section>
+  <div class="ticker"><div class="ticker-track" aria-label="Minecraft Java Edition on Android. Your game, your way."><span>YOUR WORLD, YOUR WAY</span><b>✳</b><span>JAVA EDITION ON ANDROID</span><b>✳</b><span>MADE FOR ADVENTURE</span><b>✳</b><span>YOUR WORLD, YOUR WAY</span><b>✳</b><span>JAVA EDITION ON ANDROID</span><b>✳</b><span>MADE FOR ADVENTURE</span><b>✳</b></div></div>
 
-  <div class="feature-strip"><div class="shell strip-inner"><div><span class="strip-mark">✳</span><b>BUILT FOR YOUR NEXT WORLD</b></div><div class="strip-points"><span>JAVA EDITION</span><span>ANDROID NATIVE</span><span>OPEN SOURCE</span></div></div></div>
+  <section class="section features" id="features"><div class="shell">
+    <div class="section-head"><div><p class="overline"><span>01 /</span> WHY TURBOCRAFT</p><h2>A little launcher.<br><em>A lot of world.</em></h2></div><p>Everything you love about Java Edition, with the freedom to make it your own. The next adventure is already in your pocket.</p></div>
+    <div class="feature-grid"><article class="feature-card feature-card-large"><div class="feature-card-top"><span class="feature-icon"><svg><use href="#layers"/></svg></span><span class="feature-no">01 — EXPLORE</span></div><div><h3>Play your way.</h3><p>From Vanilla to modded adventures, choose your version and bring your world to life with Fabric, Forge or NeoForge.</p><span class="feature-tag">VERSIONS + MOD LOADERS</span></div><div class="feature-glow"></div></article><article class="feature-card"><div class="feature-card-top"><span class="feature-icon"><svg><use href="#sliders"/></svg></span><span class="feature-no">02 — PERSONALIZE</span></div><div><h3>Make it yours.</h3><p>Move and customize your controls, adjust rendering settings and create a setup that feels just right.</p><span class="feature-tag">YOUR GAME, YOUR RULES</span></div></article><article class="feature-card"><div class="feature-card-top"><span class="feature-icon"><svg><use href="#spark"/></svg></span><span class="feature-no">03 — DISCOVER</span></div><div><h3>Ready to go.</h3><p>A modern Android launcher with multiple Java runtime support and the tools to get you playing.</p><span class="feature-tag">MADE FOR ANDROID</span></div></article></div>
+  </div></section>
 
-  <section class="section features" id="features">
-    <div class="shell">
-      <div class="section-top"><div><p class="section-kicker"><span>01</span> THE GOOD STUFF</p><h2>Big adventures.<br><em>Small screen.</em></h2></div><p class="section-intro">Everything you need to make your Minecraft experience feel a little more like yours.</p></div>
-      <div class="feature-grid">
-        <article class="feature-card"><div class="feature-icon"><svg><use href="#layers"/></svg></div><div class="card-index">01 / PLAY YOUR WAY</div><h3>Your game, your rules.</h3><p>Jump into Vanilla or explore the world of mods with Fabric, Forge and NeoForge support.</p><span class="card-tag">VERSIONS &amp; MOD LOADERS</span></article>
-        <article class="feature-card"><div class="feature-icon"><svg><use href="#sliders"/></svg></div><div class="card-index">02 / MAKE IT YOURS</div><h3>Control the experience.</h3><p>Customize your controls, fine-tune rendering settings and set up your launcher your way.</p><span class="card-tag">CUSTOMIZATION</span></article>
-        <article class="feature-card"><div class="feature-icon"><svg><use href="#spark"/></svg></div><div class="card-index">03 / STAY CREATIVE</div><h3>Made to move with you.</h3><p>A modern Android interface, multiple Java runtimes and the tools to start your next adventure.</p><span class="card-tag">ANDROID READY</span></article>
-      </div>
-      <div class="features-bottom"><span>THOUGHTFULLY BUILT FOR PLAYERS</span><span>MORE PLAY. MORE POSSIBILITY. <b>✳</b></span></div>
+  <section class="section download-section" id="download"><div class="shell">
+    <div class="section-head download-heading"><div><p class="overline"><span>02 /</span> LET'S GET YOU PLAYING</p><h2>Pick your build.<br><em>Start your story.</em></h2></div><p>Download directly from here. Not sure which APK to choose? The universal build is the safe place to start.</p></div>
+    <div class="release-bar"><div><span class="release-dot"></span><span data-release-label>VERSION 1.6</span><span class="release-separator">/</span><span data-release-status>RELEASE</span></div><a data-release-notes href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/tag/v1.6">Release notes <svg><use href="#up-right"/></svg></a></div>
+    <div class="download-grid">
+      <a class="download-card recommended" data-asset="arm64" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/TurboCraft-Launcher-1.6-arm64-v8a.apk"><div class="download-card-top"><span class="platform-icon"><svg><use href="#phone"/></svg></span><span class="recommended-label">MOST MODERN PHONES</span></div><div class="download-title">Android <span>ARM64</span></div><p>For most modern 64-bit Android devices.</p><div class="download-card-bottom"><span>arm64-v8a · <span data-size="arm64">204.1 MiB</span></span><span class="download-circle"><svg><use href="#download-icon"/></svg></span></div></a>
+      <a class="download-card" data-asset="universal" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/TurboCraft-Launcher-1.6-universal.apk"><div class="download-card-top"><span class="platform-icon"><svg><use href="#layers"/></svg></span><span class="recommended-label subtle">NOT SURE? PICK THIS</span></div><div class="download-title">Universal <span>APK</span></div><p>One build for supported architectures.</p><div class="download-card-bottom"><span>Universal · <span data-size="universal">394.1 MiB</span></span><span class="download-circle"><svg><use href="#download-icon"/></svg></span></div></a>
+      <a class="download-card" data-asset="armv7" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/TurboCraft-Launcher-1.6-armeabi-v7a.apk"><div class="download-card-top"><span class="platform-icon"><svg><use href="#phone"/></svg></span></div><div class="download-title">Android <span>ARMv7</span></div><p>For older 32-bit ARM devices.</p><div class="download-card-bottom"><span>armeabi-v7a · <span data-size="armv7">195.5 MiB</span></span><span class="download-circle"><svg><use href="#download-icon"/></svg></span></div></a>
     </div>
-  </section>
+    <div class="other-downloads"><span>OTHER ARCHITECTURES</span><a data-asset="x86" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/TurboCraft-Launcher-1.6-x86.apk">x86 <span data-size="x86">186.3 MiB</span> ↗</a><a data-asset="x86_64" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/TurboCraft-Launcher-1.6-x86_64.apk">x86_64 <span data-size="x86_64">210.2 MiB</span> ↗</a><a data-checksums href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/SHA256SUMS.txt">SHA-256 checksums ↗</a><a href="https://github.com/TCL-Team/TurboCraft-Launcher/releases">All releases ↗</a></div>
+    <p class="download-note">APK files are hosted on GitHub Releases. Android may ask you to allow installation from your browser. <span id="release-note">Showing version 1.6.</span></p>
+  </div></section>
 
-  <section class="section setup" id="getting-started">
-    <div class="shell setup-layout">
-      <div class="setup-heading"><p class="section-kicker"><span>02</span> LET'S GET YOU IN</p><h2>Ready when<br><em>you are.</em></h2><p>Getting started is simple. Pick your build, set things up, and make your first world yours.</p><a class="text-link" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases">Browse all releases <svg><use href="#arrow-up-right"/></svg></a></div>
-      <div class="steps">
-        <article class="step"><span class="step-number">01</span><div><h3>Download the launcher</h3><p>Open the releases page and choose an APK for your device. Not sure which one? Choose the universal APK.</p></div><svg><use href="#download"/></svg></article>
-        <article class="step"><span class="step-number">02</span><div><h3>Install &amp; set up</h3><p>Open the APK, allow installation if Android asks, then follow the in-app setup guide.</p></div><svg><use href="#sliders"/></svg></article>
-        <article class="step"><span class="step-number">03</span><div><h3>Start exploring</h3><p>Set up your account, choose a game version and launch your next adventure.</p></div><svg><use href="#arrow-up-right"/></svg></article>
-      </div>
-    </div>
-  </section>
+  <section class="section setup" id="getting-started"><div class="shell setup-layout"><div class="setup-heading"><p class="overline"><span>03 /</span> YOUR NEXT ADVENTURE</p><h2>Three steps.<br><em>Infinite worlds.</em></h2><p>From download to your next adventure in a few simple steps.</p><a class="inline-link" href="#download">Choose your APK <svg><use href="#arrow"/></svg></a></div><div class="steps"><article class="step"><span>01</span><div><h3>Download your build</h3><p>Choose the right APK above. The universal version supports all included architectures.</p></div><svg><use href="#download-icon"/></svg></article><article class="step"><span>02</span><div><h3>Install and set up</h3><p>Open the APK, allow installation if Android asks, and follow the launcher setup.</p></div><svg><use href="#sliders"/></svg></article><article class="step"><span>03</span><div><h3>Find your next world</h3><p>Set up your account, select a game version and let the adventure begin.</p></div><svg><use href="#spark"/></svg></article></div></div></section>
 
-  <section class="community section" id="community">
-    <div class="shell community-box">
-      <div class="community-copy"><p class="section-kicker"><span>03</span> BETTER TOGETHER</p><h2>Good worlds.<br><em>Great people.</em></h2><p>Questions, ideas, or a world worth sharing? Come hang out with the TurboCraft community on Discord.</p><a class="button button-dark" href="https://discord.gg/bwkpJZB6NS" target="_blank" rel="noopener noreferrer">Join our Discord <svg><use href="#arrow-up-right"/></svg></a></div>
-      <div class="community-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><span class="orbit-star star-one">✳</span><span class="orbit-star star-two">✦</span><div class="community-emblem"><img src="assets/turbocraft-icon.png" alt=""></div><span class="art-label">THE TURBOCRAFT COMMUNITY<br><b>YOU'RE INVITED.</b></span></div>
-    </div>
-  </section>
+  <section class="community section" id="community"><div class="shell community-box"><div class="community-copy"><p class="overline"><span>04 /</span> BETTER TOGETHER</p><h2>Great games.<br><em>Better people.</em></h2><p>Need a hand, have an idea, or just want to share your world? There's a place for you in the TurboCraft community.</p><a class="button button-dark" href="https://discord.gg/bwkpJZB6NS" target="_blank" rel="noopener noreferrer">Join our Discord <svg><use href="#up-right"/></svg></a></div><div class="community-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><span class="orbit-star star-one">✳</span><span class="orbit-star star-two">✦</span><div class="community-emblem"><img src="assets/turbocraft-icon.png" alt=""></div><span class="art-label">THE TURBOCRAFT COMMUNITY<br><b>YOU'RE INVITED.</b></span></div></div></section>
 
-  <section class="section faq" id="faq"><div class="shell faq-layout"><div><p class="section-kicker"><span>04</span> THE DETAILS</p><h2>Good to<br><em>know.</em></h2><p class="faq-intro">A few quick answers before you head out.</p></div><div class="faq-list">
-    <details><summary>What is TurboCraft Launcher?<svg><use href="#plus"/></svg></summary><p>TurboCraft is an open-source Android launcher for Minecraft: Java Edition, with support for customization, different game versions and mod loaders.</p></details>
-    <details><summary>Which devices can run it?<svg><use href="#plus"/></svg></summary><p>TurboCraft requires Android 8.0 or newer. Performance and game compatibility depend on your device, selected version, renderer and mods.</p></details>
-    <details><summary>Which APK should I download?<svg><use href="#plus"/></svg></summary><p>The universal APK is the easiest choice if you are unsure. The arm64-v8a build is intended for most modern 64-bit ARM Android devices. Other builds are available for supported architectures.</p></details>
-    <details><summary>Do I need Minecraft: Java Edition?<svg><use href="#plus"/></svg></summary><p>TurboCraft is a launcher, not a copy of the game. To use official online services, sign in with a Microsoft account that owns Minecraft: Java Edition.</p></details>
-    <details><summary>Where can I get help?<svg><use href="#plus"/></svg></summary><p>Join the <a href="https://discord.gg/bwkpJZB6NS">Discord community</a> for help and discussion, or report a reproducible issue on <a href="https://github.com/TCL-Team/TurboCraft-Launcher/issues">GitHub</a>.</p></details>
-  </div></div></section>
-
-  <section class="bottom-cta"><div class="shell bottom-inner"><div><p class="section-kicker"><span>✳</span> YOUR NEXT ADVENTURE AWAITS</p><h2>Let's get <em>going.</em></h2><p>One launcher. A world of possibilities.</p></div><a class="button button-lime" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases"><svg><use href="#download"/></svg> Download for Android <span>↗</span></a></div></section>
+  <section class="section faq" id="faq"><div class="shell faq-layout"><div><p class="overline"><span>05 /</span> THE DETAILS</p><h2>Good to<br><em>know.</em></h2><p class="faq-intro">A few quick answers before you head out.</p></div><div class="faq-list"><details><summary>What is TurboCraft Launcher?<svg><use href="#plus"/></svg></summary><p>TurboCraft is an open-source Android launcher for Minecraft: Java Edition, with customization, different game versions and mod loader support.</p></details><details><summary>Which devices can run it?<svg><use href="#plus"/></svg></summary><p>TurboCraft requires Android 8.0 or newer. Performance and game compatibility depend on your device, selected version, renderer and mods.</p></details><details><summary>Which APK should I download?<svg><use href="#plus"/></svg></summary><p>The universal APK is the easiest choice if you're unsure. ARM64 is for most modern 64-bit ARM Android devices. Other builds are available for supported architectures.</p></details><details><summary>Do I need Minecraft: Java Edition?<svg><use href="#plus"/></svg></summary><p>TurboCraft is a launcher, not a copy of the game. To use official online services, sign in with a Microsoft account that owns Minecraft: Java Edition.</p></details><details><summary>Where can I get help?<svg><use href="#plus"/></svg></summary><p>Join the <a href="https://discord.gg/bwkpJZB6NS">Discord community</a> for help or report an issue on <a href="https://github.com/TCL-Team/TurboCraft-Launcher/issues">GitHub</a>.</p></details></div></div></section>
+  <section class="bottom-cta"><div class="shell bottom-inner"><div><p class="overline"><span>✳</span> YOUR NEXT ADVENTURE AWAITS</p><h2>Ready to <em>play?</em></h2><p>One launcher. A world of possibilities.</p></div><a class="button button-primary" data-asset="arm64" href="https://github.com/TCL-Team/TurboCraft-Launcher/releases/download/v1.6/TurboCraft-Launcher-1.6-arm64-v8a.apk"><svg><use href="#download-icon"/></svg><span>Download for Android<small>ARM64 · <span data-size="arm64">204.1 MiB</span></small></span><span class="button-arrow">↘</span></a></div></section>
 </main>
-<footer><div class="shell"><div class="footer-top"><a class="brand footer-brand" href="#top"><img src="assets/turbocraft-icon.png" alt="" width="44" height="44"><span>TURBOCRAFT <small>LAUNCHER</small></span></a><div class="footer-links"><a href="#features">Features</a><a href="#getting-started">Get started</a><a href="https://discord.gg/bwkpJZB6NS">Discord ↗</a><a href="https://github.com/TCL-Team/TurboCraft-Launcher">GitHub ↗</a></div></div><div class="footer-bottom"><span>© <span id="year">2026</span> TURBOCRAFT LAUNCHER. MADE FOR ADVENTURE.</span><span>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</span></div></div></footer>
+<footer><div class="shell"><div class="footer-top"><a class="brand" href="#top"><img src="assets/turbocraft-icon.png" alt="" width="46" height="46"><span>TURBOCRAFT<small>LAUNCHER</small></span></a><div class="footer-links"><a href="#download">Download</a><a href="#getting-started">Get started</a><a href="https://discord.gg/bwkpJZB6NS">Discord ↗</a><a href="https://github.com/TCL-Team/TurboCraft-Launcher">GitHub ↗</a></div></div><div class="footer-bottom"><span>© <span id="year">2026</span> TURBOCRAFT LAUNCHER. MADE FOR ADVENTURE.</span><span>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</span></div></div></footer>
 </body>
 </html>
