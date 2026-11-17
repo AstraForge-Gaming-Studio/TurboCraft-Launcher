@@ -1,3 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Intentionally inert: do not expose upstream components before Rust is integrated. -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The Rust engine exits its process on game shutdown. Never share TCL's process. -->
+    <application>
+        <activity android:name="io.github.juanluci.starling.LauncherActivity"
+            android:exported="false" android:process=":rust_launcher"
+            android:excludeFromRecents="true" android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name="io.github.juanluci.starling.GameActivity"
+            android:exported="false" android:process=":rust_game"
+            android:launchMode="singleTask" android:screenOrientation="sensorLandscape"
+            android:resizeableActivity="false" android:theme="@style/Starling.Game"
+            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|density|screenSize|smallestScreenSize|layoutDirection|colorMode|fontWeightAdjustment|grammaticalGender">
+            <meta-data android:name="android.app.lib_name" android:value="horizon_android" />
+            <meta-data android:name="android.app.func_name" android:value="starling_on_create" />
+        </activity>
+        <activity android:name="io.github.juanluci.starling.DiagnosticsActivity"
+            android:exported="false" android:process=":rust_diagnostics"
+            android:theme="@style/Starling.Game" android:hardwareAccelerated="false" />
+        <service android:name="io.github.juanluci.starling.WorkService"
+            android:process=":rust_game" android:exported="false"
+            android:foregroundServiceType="dataSync" />
+        <provider android:name="io.github.juanluci.starling.UpdateProvider"
+            android:authorities="${applicationId}.updates" android:exported="false"
+            android:grantUriPermissions="true" />
+        <provider android:name="io.github.juanluci.starling.GameFolderProvider"
+            android:authorities="${applicationId}.documents" android:exported="true"
+            android:process=":rust_documents" android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+    </application>
+</manifest>

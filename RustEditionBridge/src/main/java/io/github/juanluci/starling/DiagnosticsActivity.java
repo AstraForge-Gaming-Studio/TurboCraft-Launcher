@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 /** A system window in its own process. Opening it does not load the game or create a GPU. */
 public final class DiagnosticsActivity extends Activity {
+    @Override public File getFilesDir() { return RustStorage.root(super.getFilesDir()); }
     private TextView status;
     private final ArrayList<Button> actions = new ArrayList<Button>();
     private String latest;

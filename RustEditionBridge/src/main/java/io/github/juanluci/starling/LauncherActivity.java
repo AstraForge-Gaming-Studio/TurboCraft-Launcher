@@ -29,6 +29,7 @@ import java.io.OutputStream;
  * its old process has ended.
  */
 public final class LauncherActivity extends Activity {
+    @Override public File getFilesDir() { return RustStorage.root(super.getFilesDir()); }
     /** The game's process id: start the game again once it has ended. */
     static final String AFTER = "io.github.juanluci.starling.AFTER";
 

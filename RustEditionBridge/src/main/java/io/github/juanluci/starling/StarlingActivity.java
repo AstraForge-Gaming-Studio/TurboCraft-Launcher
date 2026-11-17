@@ -72,6 +72,8 @@ import javax.crypto.spec.GCMParameterSpec;
  * mouse's capture and the controllers' makers and motors.
  */
 public class StarlingActivity extends NativeActivity {
+    /** Keep the native runtime and its saves outside TCL's own files. */
+    @Override public File getFilesDir() { return RustStorage.root(super.getFilesDir()); }
     private static final int PICK_FILE = 1;
     /** Horizon Android's folder picked: its worlds and packs come over (HorizonImport). */
     private static final int PICK_HORIZON = 2;
@@ -93,31 +95,7 @@ public class StarlingActivity extends NativeActivity {
      * build named by GAME_LIBRARY, the very library loaded here.
      */
     private void loadGame() {
-        String stamp = NativeMods.stamp(this);
-        if (stamp != null) {
-            try {
-                // The game writes it beside the builds it downloads, and tells an old build by it.
-                Os.setenv(APK_STAMP, stamp, true);
-            } catch (ErrnoException e) {
-                // The game then marks no build as made for this install: none loads.
-            }
-        }
-        File build = NativeMods.chosen(this, versionName());
-        if (build != null) {
-            try {
-                Os.setenv(GAME_LIBRARY, build.getPath(), true);
-                System.load(build.getPath());
-                modBuild = build;
-                return;
-            } catch (UnsatisfiedLinkError | ErrnoException e) {
-                try {
-                    Os.unsetenv(GAME_LIBRARY);
-                } catch (ErrnoException ignored) {
-                    // Nothing was set.
-                }
-                NativeMods.failed(this, e.getMessage());
-            }
-        }
+        // Only the packaged engine may run inside TurboCraft.
         System.loadLibrary("horizon_android");
     }
 
@@ -142,16 +120,8 @@ public class StarlingActivity extends NativeActivity {
      *  StarlingDev for Starling Dev (build_apk.py --dev) and StarlingPreview for Starling Preview
      *  (--preview), which keep out of the release's. */
     static String sharedFolder(Context context) {
-        boolean allowed = Build.VERSION.SDK_INT >= 30
-                ? Environment.isExternalStorageManager()
-                : context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED;
-        String id = context.getPackageName();
-        String name = id.endsWith(".dev") ? "StarlingDev"
-                : id.endsWith(".preview") ? "StarlingPreview" : "Starling";
-        return allowed
-                ? new File(Environment.getExternalStorageDirectory(), name).getPath()
-                : null;
+        // Do not migrate or modify a separately installed Horizon/Starling folder.
+        return null;
     }
 
     public void openDiagnostics() {
@@ -907,8 +877,8 @@ public class StarlingActivity extends NativeActivity {
     /** Whether this is a release (signed with the release key, not debuggable): only a release
      * can install the next one over itself. */
     public boolean releaseBuild() {
-        return (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)
-                == 0;
+        // The upstream updater must not offer a Starling APK as a TCL update.
+        return false;
     }
 
     /**
@@ -917,15 +887,8 @@ public class StarlingActivity extends NativeActivity {
      * offers to open the game again. False where no installer takes it.
      */
     public boolean installUpdate(String name) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(UpdateProvider.uri(getPackageName(), name), UpdateProvider.TYPE);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            startActivity(intent);
-            return true;
-        } catch (ActivityNotFoundException | SecurityException e) {
-            return false;
-        }
+        // Upstream APKs cannot update TurboCraft; updates are managed by TCL.
+        return false;
     }
 
     /** The Android Keystore key the account's tokens are sealed with; it never leaves the

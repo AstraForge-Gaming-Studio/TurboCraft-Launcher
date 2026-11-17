@@ -3849,4 +3849,10 @@
     <string name="settings_launcher_animate_extent_summary">Adjust the intensity of the launcher animations</string>
     <string name="settings_launcher_swap_animate_type_title">Transition Animation</string>
     <string name="settings_launcher_swap_animate_type_summary">Choose the page transition animation that best suits your preferences</string>
+    <string name="java_edition_title">Java Edition</string>
+    <string name="rust_edition_selector">Edition</string>
+    <string name="rust_edition_title">Rust Edition (Experimental)</string>
+    <string name="rust_edition_play">Play Rust Edition</string>
+    <string name="rust_edition_experimental_notice">This unofficial Horizon-based client is experimental and targets Minecraft Java 26.3. It uses separate game files and sign-in. Java mods and TurboCraft controls are not supported. Back up any worlds before importing them.</string>
+    <string name="rust_edition_launch_failed">Rust Edition is unavailable in this build.</string>
 </resources>

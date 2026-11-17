@@ -33,7 +33,7 @@ public final class UpdateProvider extends ContentProvider {
                 : uri.getPathSegments().size() == 1 && name.matches("[A-Za-z0-9._-]+\\.apk"))) {
             throw new FileNotFoundException(String.valueOf(uri));
         }
-        File file = new File(new File(getContext().getFilesDir(), report ? "performance" : "updates"), name);
+        File file = new File(new File(RustStorage.root(getContext().getFilesDir()), report ? "performance" : "updates"), name);
         if (!file.isFile()) {
             throw new FileNotFoundException(file.getPath());
         }

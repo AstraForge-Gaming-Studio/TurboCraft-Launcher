@@ -1,6 +1,6 @@
 name: Rust edition engine build check
 
-# This is an isolated prototype artifact, not a TCL release or playable APK.
+# Experimental build and packaging checks only. This workflow never publishes a release.
 on:
   push:
     branches: ['arena/**']
@@ -8,6 +8,7 @@ on:
       - 'rust-edition/**'
       - 'RustEditionBridge/**'
       - 'settings.gradle.kts'
+      - 'TCL/**'
       - '.github/workflows/rust-engine-check.yml'
   workflow_dispatch:
     inputs:
@@ -78,6 +79,20 @@ jobs:
         env:
           RUST_EDITION_ABI: ${{ inputs.abi || 'arm64-v8a' }}
         run: ./rust-edition/build-engine.sh .external/starling "$RUST_EDITION_ABI" "$RUNNER_TEMP/rust-engine"
+      - name: Build setup assets and stage the matching runtime
+        env:
+          RUST_EDITION_ABI: ${{ inputs.abi || 'arm64-v8a' }}
+        run: |
+          python3 .external/starling/packaging/android/build_apk.py --abi "$RUST_EDITION_ABI" --profile quick --no-build
+          apk=$(find .external/starling/target/android -maxdepth 1 -name "starling-*-$RUST_EDITION_ABI.apk" -print -quit)
+          test -n "$apk"
+          python3 rust-edition/stage_runtime.py "$apk" "$RUST_EDITION_ABI" "$RUNNER_TEMP/rust-engine" "$RUNNER_TEMP/rust-runtime"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rust-runtime-${{ inputs.abi || 'arm64-v8a' }}
+          path: ${{ runner.temp }}/rust-runtime/
+          if-no-files-found: error
+          retention-days: 1
       - name: Upload engine build proof
         uses: actions/upload-artifact@v4
         with:
@@ -85,3 +100,58 @@ jobs:
           path: ${{ runner.temp }}/rust-engine/
           if-no-files-found: error
           retention-days: 7
+
+  integration:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: rust-runtime-${{ inputs.abi || 'arm64-v8a' }}
+          path: rust-edition/runtime
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+      - name: Install native build tools
+        run: |
+          curl -fsSL "https://github.com/bbqsrc/cargo-ndk/releases/download/v4.1.2/cargo-ndk-x86_64-unknown-linux-gnu-v4.1.2.tgz" | tar xz -C "$HOME/.cargo/bin" --strip-components=1
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager --install 'ndk;25.2.9519653' 'cmake;3.22.1'
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Assemble experimental TCL debug APK
+        env:
+          ABI: ${{ inputs.abi || 'arm64-v8a' }}
+        run: |
+          case "$ABI" in
+            arm64-v8a) arch=arm64 ;;
+            armeabi-v7a) arch=arm ;;
+            x86) arch=x86 ;;
+            x86_64) arch=x86_64 ;;
+            *) exit 1 ;;
+          esac
+          ./gradlew :TCL:assembleDebug -Darch="$arch" -PrustEdition=true
+      - name: Verify Rust files in APK
+        env:
+          ABI: ${{ inputs.abi || 'arm64-v8a' }}
+        run: |
+          python3 - <<'PY'
+          import glob, hashlib, json, os, zipfile
+          abi = os.environ['ABI']
+          manifests = json.load(open(f'rust-edition/runtime/runtime-{abi}.json'))['sha256']
+          apks = glob.glob('TCL/build/outputs/apk/debug/*.apk')
+          assert len(apks) == 1, apks
+          with zipfile.ZipFile(apks[0]) as apk:
+              for path, expected in manifests.items():
+                  apk_path = path.replace('jniLibs/', 'lib/', 1)
+                  actual = hashlib.sha256(apk.read(apk_path)).hexdigest()
+                  assert actual == expected, f'Wrong or missing runtime file: {apk_path}'
+          print('Verified packaged Rust runtime and setup assets:', apks[0])
+          PY

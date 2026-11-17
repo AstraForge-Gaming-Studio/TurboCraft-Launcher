@@ -1,49 +1,49 @@
-# Rust edition integration: engine build prototype
+# Experimental Rust edition integration
 
-TurboCraft currently launches Minecraft's Java client through `VMActivity` and
-`GameLauncher`. Horizon/Starling is an unofficial native Rust client, not a
-Minecraft edition or a Java mod. This directory starts a separate integration:
-it builds the upstream Android engine at a pinned commit and verifies its
-NativeActivity entry point. It does **not** add a playable edition yet.
+This is an optional integration of [Starling](https://github.com/starling-client/starling)
+(commit `5432370d573642041585c69b40fb045b27133488`), an unofficial Horizon-based
+native Rust client targeting Minecraft Java 26.3. It is not made by Mojang or
+Microsoft and does not replace the existing Java launcher. Java mods and TCL
+control layouts are not supported. The Rust client has its own sign-in and setup;
+it requires the player's own Minecraft Java resources and does not bundle them.
 
-Upstream: <https://github.com/starling-client/starling>, commit
-`5432370d573642041585c69b40fb045b27133488`. The upstream project is MIT
-licensed; its license and third-party notices must accompany any distribution.
-Do not commit upstream APKs, game files, generated assets or build artifacts.
+**Status:** The ARM64 native engine and isolated bridge have built on CI.
+The integrated APK and first-run setup, authentication, rendering, input, restart,
+and save handling have not yet been verified on a device. The integration is
+therefore explicitly opt-in and must not be represented as ready to play.
+Standard builds and releases leave it disabled.
 
-## Build check
+## Experimental build
 
-The `Rust edition engine build check` GitHub Actions workflow builds ARM64
-when the Rust integration changes on an Arena branch. It can also be manually
-dispatched for a selected ABI after the workflow exists on the default branch.
-The resulting library, build identity, SHA-256 and upstream notices are kept as
-a short-lived CI artifact. It is not part of TCL's release pipeline.
-
-For a local check, obtain an unmodified checkout of the pinned commit and the
-upstream Android build dependencies, including Android SDK, NDK 28.2.13676358,
-Rust, cargo-ndk, Python and JDK. Then run:
+Use an unmodified Starling checkout at the pinned commit, and install its Android
+build dependencies (including SDK build-tools 35.0.0, platform 36, NDK
+28.2.13676358, Rust, cargo-ndk, Python and JDK 25). For each ABI required:
 
 ```sh
-./rust-edition/build-engine.sh /path/to/starling arm64-v8a /path/to/output
+./rust-edition/build-engine.sh /path/to/starling arm64-v8a /tmp/starling-proof
+python3 /path/to/starling/packaging/android/build_apk.py --abi arm64-v8a --profile quick --no-build
+python3 rust-edition/stage_runtime.py /path/to/starling/target/android/starling-0.8.0-arm64-v8a.apk arm64-v8a /tmp/starling-proof rust-edition/runtime
 ```
 
-## What remains before users can play
+The staging script checks the APK engine against the locally verified library,
+requires the native Java launchers and all setup assets, and writes per-file
+hashes. Stage all four ABIs for a universal APK, or the appropriate ABI for a
+split. Then switch to TCL's build prerequisites (including JDK 21 and NDK
+25.2.9519653) and build, for example:
 
-- Connect the isolated `RustEditionBridge` Android / JNI sources and their
-  lifecycle in a separate game process, without routing it through the JVM
-  launcher. The bridge is compile-only and deliberately not part of TCL yet.
-- Build and package the engine for each supported ABI, plus all upstream
-  preparation assets, native Java launchers, required Android code and notices;
-  the isolated library from this check is **not sufficient** for gameplay.
-- Implement verified acquisition and preparation of game resources from the
-  user's own Java Edition files / official sources, with progress and errors.
-  Do not redistribute Minecraft assets.
-- Add an explicit experimental edition selection and keep Rust game files,
-  account handling, worlds and settings separate until compatibility is
-  validated. Do not assume Java mods or TCL control layouts work with Rust.
-- Test installation, first-run preparation, input, authentication, rendering,
-  process exit and save safety on physical devices and supported ABIs.
+```sh
+./gradlew :TCL:assembleDebug -Darch=arm64 -PrustEdition=true
+```
 
-The engine targets Minecraft Java 26.3, not arbitrary Java version/mod-loader
-combinations. It is not affiliated with Mojang or Microsoft; compatibility and
-performance must not be claimed without device testing.
+Gradle rejects missing or altered staged files. `rustRuntimeDir` may be set to
+an alternate absolute directory using `-PrustRuntimeDir=/path/to/runtime`.
+The GitHub `rust-engine-check.yml` workflow also builds and checks an experimental
+ABI-specific debug APK without publishing a release. Packaging validation is not
+a substitute for device testing. Runtime artifacts are ignored by Git; never
+commit Minecraft resources, generated assets, or APKs.
+
+The bridge runs the native game in its own process, uses a private Rust data
+folder, and disables upstream APK updates and downloaded native mod builds.
+Upstream MIT license and third-party notices are in `RustEditionBridge/` and
+must accompany distributions. Do not install such a build over a production
+installation without appropriate backups and further validation.
