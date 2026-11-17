@@ -33,8 +33,8 @@ val defaultKeyPassword = project.findProperty("default_key_password") as? String
 val defaultCurseForgeApiKey = project.findProperty("curseforge_api_key") as? String
 
 val projectArch: String = System.getProperty("arch", "all")
-// Explicitly opt in until native engine and real-device validation are complete.
-val rustEditionEnabled = providers.gradleProperty("rustEdition").orElse("false").get().toBooleanStrict()
+// Enabled in launcher builds; missing runtime files fail the build rather than hiding the edition.
+val rustEditionEnabled = providers.gradleProperty("rustEdition").orElse("true").get().toBooleanStrict()
 val rustRuntimeDir = file(providers.gradleProperty("rustRuntimeDir")
     .orElse(rootProject.layout.projectDirectory.dir("rust-edition/runtime").asFile.absolutePath).get())
 

@@ -59,7 +59,7 @@ jobs:
         continue-on-error: true
         run: |
           chmod +x gradlew
-          ./gradlew :TCL:compileDebugKotlin --console=plain 2>&1 | tee kotlin-check.log
+          ./gradlew :TCL:compileDebugKotlin -PrustEdition=false --console=plain 2>&1 | tee kotlin-check.log
           exit ${PIPESTATUS[0]}
 
       # Raw job logs are not reliably retrievable through the API, so surface compiler errors

@@ -7,7 +7,7 @@ lookup. Local integration changes isolate data and processes, disable upstream
 APK updating and downloaded native mod builds, and register internal Android
 components. The MIT license and third-party notices are included here.
 
-The launcher links this module only when `-PrustEdition=true` is explicitly
-provided, and the required per-ABI native libraries and setup assets have been
-staged. See `rust-edition/README.md` for build instructions and limitations.
+The launcher links this module by default when the required per-ABI native
+libraries and setup assets have been staged. Java-only development builds can
+explicitly opt out with `-PrustEdition=false`. See `rust-edition/README.md` for build instructions and limitations.
 An isolated bridge compile alone does not validate gameplay or setup.

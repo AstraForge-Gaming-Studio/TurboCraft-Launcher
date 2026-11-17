@@ -8,10 +8,10 @@ control layouts are not supported. The Rust client has its own sign-in and setup
 it requires the player's own Minecraft Java resources and does not bundle them.
 
 **Status:** The ARM64 native engine and isolated bridge have built on CI.
-The integrated APK and first-run setup, authentication, rendering, input, restart,
-and save handling have not yet been verified on a device. The integration is
-therefore explicitly opt-in and must not be represented as ready to play.
-Standard builds and releases leave it disabled.
+The ARM64 integrated debug APK has compiled and its staged runtime has been
+verified. First-run setup, authentication, rendering, input, restart and save
+handling have not yet been verified on a device; other architectures need CI
+and device verification. Do not represent this as tested gameplay.
 
 ## Experimental build
 
@@ -33,10 +33,14 @@ split. Then switch to TCL's build prerequisites (including JDK 21 and NDK
 experimental app module) and build, for example:
 
 ```sh
-./gradlew :TCL:assembleDebug -Darch=arm64 -PrustEdition=true
+bash ./gradlew :TCL:assembleDebug -Darch=arm64
 ```
 
-Gradle rejects missing or altered staged files. `rustRuntimeDir` may be set to
+Rust is enabled by default; Gradle rejects missing or altered staged files rather
+than silently producing an APK without the edition. Set `-PrustEdition=false`
+only for an explicitly Java-only development build. The shared build workflow
+builds and stages the pinned runtime for all ABIs, packages it, and checks each
+APK. A branch push must not publish a release. Gradle rejects missing or altered staged files. `rustRuntimeDir` may be set to
 an alternate absolute directory using `-PrustRuntimeDir=/path/to/runtime`.
 The GitHub `rust-engine-check.yml` workflow also builds and checks an experimental
 ABI-specific debug APK without publishing a release. Packaging validation is not
