@@ -151,7 +151,7 @@ jobs:
             *) exit 1 ;;
           esac
           set -o pipefail
-          ./gradlew :TCL:assembleDebug -Darch="$arch" -PrustEdition=true 2>&1 | tee integration-build.log
+          bash ./gradlew :TCL:assembleDebug -Darch="$arch" -PrustEdition=true 2>&1 | tee integration-build.log
       - name: Report integration build errors
         if: failure()
         run: |
