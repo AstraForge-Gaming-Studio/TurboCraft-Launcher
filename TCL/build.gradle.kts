@@ -120,7 +120,10 @@ android {
         }
     }
 
-    ndkVersion = "25.2.9519653"
+    // Experimental Starling's bundled Java runtime needs the NDK 28 C++ runtime.
+    // Use the same NDK for TCL's native libraries so AGP cannot select NDK 25's
+    // incompatible libc++_shared.so when merging duplicate library names.
+    ndkVersion = if (rustEditionEnabled) "28.2.13676358" else "25.2.9519653"
 
     externalNativeBuild {
         ndkBuild {

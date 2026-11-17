@@ -29,7 +29,8 @@ The staging script checks the APK engine against the locally verified library,
 requires the native Java launchers and all setup assets, and writes per-file
 hashes. Stage all four ABIs for a universal APK, or the appropriate ABI for a
 split. Then switch to TCL's build prerequisites (including JDK 21 and NDK
-25.2.9519653) and build, for example:
+25.2.9519653 for the other TCL modules, plus NDK 28.2.13676358 for the
+experimental app module) and build, for example:
 
 ```sh
 ./gradlew :TCL:assembleDebug -Darch=arm64 -PrustEdition=true
