@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Intentionally inert: do not expose upstream components before Rust is integrated. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" />

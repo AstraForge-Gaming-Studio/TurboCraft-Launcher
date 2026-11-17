@@ -41,3 +41,6 @@ include(":InputMap")
 include(":Guide")
 include(":PetLib")
 include(":DiscordRPC")
+
+// Isolated Rust NativeActivity bridge; not yet linked into the TCL app.
+include(":RustEditionBridge")

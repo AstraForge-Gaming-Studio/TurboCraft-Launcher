@@ -29,8 +29,9 @@ Rust, cargo-ndk, Python and JDK. Then run:
 
 ## What remains before users can play
 
-- Integrate the upstream Android NativeActivity / JNI bridge and its lifecycle
-  in a separate game process, without routing it through the JVM launcher.
+- Connect the isolated `RustEditionBridge` Android / JNI sources and their
+  lifecycle in a separate game process, without routing it through the JVM
+  launcher. The bridge is compile-only and deliberately not part of TCL yet.
 - Build and package the engine for each supported ABI, plus all upstream
   preparation assets, native Java launchers, required Android code and notices;
   the isolated library from this check is **not sufficient** for gameplay.
