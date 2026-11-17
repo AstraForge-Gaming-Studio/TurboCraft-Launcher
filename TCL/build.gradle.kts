@@ -1,3 +1,4 @@
+import java.security.MessageDigest
 import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import com.android.build.api.variant.impl.VariantOutputImpl
 import com.android.build.gradle.tasks.MergeSourceSetFolders
@@ -368,7 +369,7 @@ if (rustEditionEnabled) {
                 for (path in paths) {
                     val input = File(rustRuntimeDir, path)
                     check(input.isFile) { "Missing Rust runtime file: $path" }
-                    val digest = java.security.MessageDigest.getInstance("SHA-256")
+                    val digest = MessageDigest.getInstance("SHA-256")
                     input.inputStream().use { stream ->
                         val buffer = ByteArray(65536)
                         while (true) {
