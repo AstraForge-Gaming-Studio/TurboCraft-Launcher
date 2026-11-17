@@ -132,7 +132,12 @@ android {
         jniLibs {
             useLegacyPackaging = true
             pickFirsts += listOf("**/libbytehook.so", "**/libmobileglues.so", "**/libSimpleFPEWrapper.so")
-            if (rustEditionEnabled) pickFirsts += "**/libc++_shared.so"
+            if (rustEditionEnabled) {
+                pickFirsts += "**/libc++_shared.so"
+                // These are verified byte-for-byte against the staged runtime after packaging.
+                keepDebugSymbols += listOf("**/libhorizon_android.so", "**/libstarling_java.so",
+                    "**/libstarling_javac.so", "**/libc++_shared.so")
+            }
         }
     }
 

@@ -176,7 +176,13 @@ jobs:
           with zipfile.ZipFile(apks[0]) as apk:
               for path, expected in manifests.items():
                   apk_path = path.replace('jniLibs/', 'lib/', 1)
-                  actual = hashlib.sha256(apk.read(apk_path)).hexdigest()
-                  assert actual == expected, f'Wrong or missing runtime file: {apk_path}'
+                  try:
+                      actual = hashlib.sha256(apk.read(apk_path)).hexdigest()
+                  except KeyError:
+                      print(f'::error title=rust-package::Missing {apk_path}', flush=True)
+                      raise
+                  if actual != expected:
+                      print(f'::error title=rust-package::Hash mismatch for {apk_path}: {actual} expected {expected}', flush=True)
+                      raise SystemExit(1)
           print('Verified packaged Rust runtime and setup assets:', apks[0])
           PY
