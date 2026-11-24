@@ -78,6 +78,12 @@ object RuntimesManager {
         return findNearestPositive(majorVersion, getRuntimes()) { it.javaVersion }?.value?.name
     }
 
+    /** Find an installed runtime of this major version compatible with this device. */
+    fun getCompatibleJreName(majorVersion: Int): String? =
+        getRuntimes().firstOrNull { it.javaVersion == majorVersion && it.isCompatible() }?.name
+
+    fun isRuntimeUsable(name: String): Boolean = name.isNotEmpty() && loadRuntime(name).isCompatible()
+
     fun forceReload(name: String): Runtime {
         cache.remove(name)
         return loadRuntime(name)

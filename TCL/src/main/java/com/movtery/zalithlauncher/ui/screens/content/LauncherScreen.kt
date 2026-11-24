@@ -40,11 +40,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.widget.Toast
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -78,7 +73,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
@@ -715,27 +709,7 @@ private fun RightMenuContent(
     val account by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
     val version by VersionsManager.currentVersion.collectAsStateWithLifecycle()
     val isRefreshing by VersionsManager.isRefreshing.collectAsStateWithLifecycle()
-    var rustSelected by remember { mutableStateOf(false) }
-    var confirmRustLaunch by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    if (confirmRustLaunch) {
-        AlertDialog(
-            onDismissRequest = { confirmRustLaunch = false },
-            title = { Text(stringResource(R.string.rust_edition_title)) },
-            text = { Text(stringResource(R.string.rust_edition_experimental_notice)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmRustLaunch = false
-                    try {
-                        context.startActivity(Intent().setClassName(context, "io.github.juanluci.starling.LauncherActivity"))
-                    } catch (_: ActivityNotFoundException) {
-                        Toast.makeText(context, R.string.rust_edition_launch_failed, Toast.LENGTH_LONG).show()
-                    }
-                }) { Text(stringResource(R.string.main_launch_game)) }
-            },
-            dismissButton = { TextButton(onClick = { confirmRustLaunch = false }) { Text(stringResource(R.string.generic_cancel)) } }
-        )
-    }
+
 
     ConstraintLayout(
         modifier = modifier
@@ -778,32 +752,21 @@ private fun RightMenuContent(
                             versionManagerRow = coordinates
                         }
                 ) {
-                    if (BuildConfig.RUST_EDITION_ENABLED && rustSelected) {
-                        TextButton(onClick = { showList = true }, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                            Text(stringResource(R.string.rust_edition_title))
-                        }
-                    } else {
-                        VersionManagerLayout(
-                            isRefreshing = isRefreshing,
-                            version = version,
-                            modifier = Modifier
-                                .guideNode(
-                                    key = GuideKeys.Main.Step.VersionList,
-                                    preferSide = GuideSide.Above
-                                )
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            swapToVersionManage = toVersionManageScreen,
-                            openListMenu = { showList = true },
-                        )
-                    }
+                    VersionManagerLayout(
+                        isRefreshing = isRefreshing,
+                        version = version,
+                        modifier = Modifier
+                            .guideNode(
+                                key = GuideKeys.Main.Step.VersionList,
+                                preferSide = GuideSide.Above
+                            )
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        swapToVersionManage = toVersionManageScreen,
+                        openListMenu = { showList = true },
+                    )
                 }
-                if (BuildConfig.RUST_EDITION_ENABLED) {
-                    TextButton(onClick = { showList = true }) {
-                        Text(stringResource(R.string.rust_edition_selector))
-                    }
-                }
-                version?.takeIf { !rustSelected && !isRefreshing && it.isValid() }?.let {
+                version?.takeIf { !isRefreshing && it.isValid() }?.let {
                     IconButton(
                         modifier = Modifier.padding(end = 8.dp),
                         onClick = toVersionSettingsScreen
@@ -832,16 +795,6 @@ private fun RightMenuContent(
                 shape = MaterialTheme.shapes.extraLarge
             ) {
                 val versions by VersionsManager.versions.collectAsStateWithLifecycle()
-                if (BuildConfig.RUST_EDITION_ENABLED) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.java_edition_title)) },
-                        onClick = { rustSelected = false; showList = false }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.rust_edition_title)) },
-                        onClick = { rustSelected = true; showList = false }
-                    )
-                }
                 versions.forEach { version0 ->
                     DropdownMenuItem(
                         text = {
@@ -869,8 +822,8 @@ private fun RightMenuContent(
                             }
                         },
                         onClick = {
-                            rustSelected = false
-                            if (version != version0) VersionsManager.saveVersion(version0)
+                            if (version == version0) return@DropdownMenuItem
+                            VersionsManager.saveVersion(version0)
                             showList = false
                         }
                     )
@@ -890,11 +843,10 @@ private fun RightMenuContent(
                 }
                 .padding(PaddingValues(horizontal = 12.dp)),
             {
-                if (BuildConfig.RUST_EDITION_ENABLED && rustSelected) confirmRustLaunch = true
-                else onLaunchGame(null)
+                onLaunchGame(null)
             },
             {
-                MarqueeText(text = stringResource(if (rustSelected) R.string.rust_edition_play else R.string.main_launch_game))
+                MarqueeText(text = stringResource(R.string.main_launch_game))
             }
         )
     }

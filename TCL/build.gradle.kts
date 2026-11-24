@@ -1,4 +1,3 @@
-import java.security.MessageDigest
 import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import com.android.build.api.variant.impl.VariantOutputImpl
 import com.android.build.gradle.tasks.MergeSourceSetFolders
@@ -33,10 +32,6 @@ val defaultKeyPassword = project.findProperty("default_key_password") as? String
 val defaultCurseForgeApiKey = project.findProperty("curseforge_api_key") as? String
 
 val projectArch: String = System.getProperty("arch", "all")
-// Enabled in launcher builds; missing runtime files fail the build rather than hiding the edition.
-val rustEditionEnabled = providers.gradleProperty("rustEdition").orElse("true").get().toBooleanStrict()
-val rustRuntimeDir = file(providers.gradleProperty("rustRuntimeDir")
-    .orElse(rootProject.layout.projectDirectory.dir("rust-edition/runtime").asFile.absolutePath).get())
 
 fun getKeyFromLocal(envKey: String, fileName: String? = null, default: String? = null): String {
     val key = System.getenv(envKey)
@@ -80,7 +75,6 @@ android {
         versionCode = launcherVersionCode
         versionName = launcherVersionName
         manifestPlaceholders["launcher_name"] = launcherAPPName
-        buildConfigField("boolean", "RUST_EDITION_ENABLED", rustEditionEnabled.toString())
         buildConfigField("String", "DISCORD_APP_ID", "\"${discordAppId.trim().replace("\"", "")}\"")
     }
 
@@ -120,10 +114,7 @@ android {
         }
     }
 
-    // Experimental Starling's bundled Java runtime needs the NDK 28 C++ runtime.
-    // Use the same NDK for TCL's native libraries so AGP cannot select NDK 25's
-    // incompatible libc++_shared.so when merging duplicate library names.
-    ndkVersion = if (rustEditionEnabled) "28.2.13676358" else "25.2.9519653"
+    ndkVersion = "25.2.9519653"
 
     externalNativeBuild {
         ndkBuild {
@@ -135,12 +126,6 @@ android {
         jniLibs {
             useLegacyPackaging = true
             pickFirsts += listOf("**/libbytehook.so", "**/libmobileglues.so", "**/libSimpleFPEWrapper.so")
-            if (rustEditionEnabled) {
-                pickFirsts += "**/libc++_shared.so"
-                // These are verified byte-for-byte against the staged runtime after packaging.
-                keepDebugSymbols += listOf("**/libhorizon_android.so", "**/libstarling_java.so",
-                    "**/libstarling_javac.so", "**/libc++_shared.so")
-            }
         }
     }
 
@@ -255,7 +240,6 @@ buildKeys {
 }
 
 dependencies {
-    if (rustEditionEnabled) implementation(project(":RustEditionBridge"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -348,48 +332,4 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-}
-
-// Refuse to build an experimental edition with missing or modified runtime files.
-if (rustEditionEnabled) {
-    tasks.named("preBuild").configure {
-        doFirst {
-            val abis = when (projectArch) {
-                "arm64" -> listOf("arm64-v8a")
-                "arm" -> listOf("armeabi-v7a")
-                "x86" -> listOf("x86")
-                "x86_64" -> listOf("x86_64")
-                "all" -> listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
-                else -> error("Unsupported Rust edition architecture: $projectArch")
-            }
-            val requiredAssets = listOf("prepare-kit.zip", "lowbudget.zip", "StarlingVisuals.zip",
-                "diagnostic-fonts/Geist-Regular.ttf", "diagnostic-fonts/Geist-SemiBold.ttf")
-            val requiredLibraries = listOf("libhorizon_android.so", "libstarling_java.so", "libstarling_javac.so", "libc++_shared.so")
-            for (abi in abis) {
-                val manifest = File(rustRuntimeDir, "runtime-$abi.json")
-                check(manifest.isFile) { "Missing Rust runtime for $abi; see rust-edition/README.md" }
-                val data = groovy.json.JsonSlurper().parse(manifest) as Map<*, *>
-                check(data["revision"] == "5432370d573642041585c69b40fb045b27133488" && data["abi"] == abi) {
-                    "Rust runtime provenance mismatch for $abi"
-                }
-                val hashes = data["sha256"] as? Map<*, *> ?: error("Missing Rust runtime hashes for $abi")
-                val paths = requiredLibraries.map { "jniLibs/$abi/$it" } + requiredAssets.map { "assets/$it" }
-                for (path in paths) {
-                    val input = File(rustRuntimeDir, path)
-                    check(input.isFile) { "Missing Rust runtime file: $path" }
-                    val digest = MessageDigest.getInstance("SHA-256")
-                    input.inputStream().use { stream ->
-                        val buffer = ByteArray(65536)
-                        while (true) {
-                            val count = stream.read(buffer)
-                            if (count < 0) break
-                            digest.update(buffer, 0, count)
-                        }
-                    }
-                    val actual = digest.digest().joinToString("") { "%02x".format(it.toInt() and 0xff) }
-                    check(actual == hashes[path]) { "Rust runtime hash mismatch: $path" }
-                }
-            }
-        }
-    }
 }

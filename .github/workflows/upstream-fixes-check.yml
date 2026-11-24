@@ -1,0 +1,54 @@
+name: Launcher compatibility tests
+
+on:
+  push:
+    branches: ['arena/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+      - name: Install Android native build tools
+        run: |
+          curl -fsSL 'https://github.com/bbqsrc/cargo-ndk/releases/download/v4.1.2/cargo-ndk-x86_64-unknown-linux-gnu-v4.1.2.tgz' | tar xz -C "$HOME/.cargo/bin" --strip-components=1
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager --install 'ndk;25.2.9519653' 'cmake;3.22.1'
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Test account and download fixes
+        run: |
+          set -o pipefail
+          bash ./gradlew :TCL:testDebugUnitTest \
+            --tests 'com.movtery.zalithlauncher.game.account.PassportServerIdTest' \
+            --tests 'com.movtery.zalithlauncher.game.addons.mirror.AssetsSourceOrderTest' \
+            --tests 'com.movtery.zalithlauncher.game.download.engine.FetcherHttpTest' \
+            --console=plain 2>&1 | tee test-build.log
+      - name: Report failures
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          path = Path('test-build.log')
+          if path.exists():
+              lines = path.read_text(errors='replace').splitlines()
+              relevant = [line for line in lines if re.search(r'(?i)(^e: |error:|failed|failure:|what went wrong|^\* |exception)', line)]
+              text = ('\n'.join(relevant[-35:] + ['--- final output ---'] + lines[-20:]))[-12000:]
+              for i in range(0, len(text), 3000):
+                  msg = text[i:i+3000].replace('%', '%25').replace('\n', '%0A').replace('\r', '')
+                  print(f'::error title=compatibility-check-{i//3000+1}::{msg}')
+          PY

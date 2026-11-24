@@ -82,6 +82,3 @@
 -keepclasseswithmembernames class * {
     native <methods>;
 }
-
-# Starling's Rust/JNI bridge calls methods and classes by exact name.
--keep class io.github.juanluci.starling.** { *; }

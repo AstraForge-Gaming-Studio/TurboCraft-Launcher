@@ -41,6 +41,3 @@ include(":InputMap")
 include(":Guide")
 include(":PetLib")
 include(":DiscordRPC")
-
-// Optional Rust NativeActivity bridge.
-include(":RustEditionBridge")
