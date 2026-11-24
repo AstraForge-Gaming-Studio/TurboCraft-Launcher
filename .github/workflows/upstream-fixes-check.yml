@@ -76,6 +76,9 @@ jobs:
             --tests 'com.movtery.zalithlauncher.game.download.engine.FetcherHttpTest' \
             --tests 'com.movtery.zalithlauncher.game.input.EventWaitNativeTest' \
             --tests 'com.movtery.zalithlauncher.game.input.PackagedGlfwEventWaitTest' \
+            --tests 'com.movtery.zalithlauncher.game.path.GamePathSafetyTest' \
+            --tests 'com.movtery.zalithlauncher.game.version.mod.update.ReplaceUpdatedModTest' \
+            --tests 'com.movtery.zalithlauncher.game.version.multiplayer.StatusResponseFaviconTest' \
             --console=plain 2>&1 | tee test-build.log
       - name: Report failures
         if: failure()
