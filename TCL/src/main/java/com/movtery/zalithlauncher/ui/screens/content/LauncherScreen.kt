@@ -704,7 +704,7 @@ private fun LastLogCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun RightMenuContent(
     modifier: Modifier = Modifier,
