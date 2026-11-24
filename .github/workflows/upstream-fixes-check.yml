@@ -17,6 +17,14 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
+          java-version: '8'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
           java-version: '21'
       - uses: android-actions/setup-android@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -45,6 +53,14 @@ jobs:
             --tests 'com.movtery.zalithlauncher.game.addons.mirror.AssetsSourceOrderTest' \
             --tests 'com.movtery.zalithlauncher.game.download.engine.FetcherHttpTest' \
             --console=plain 2>&1 | tee test-build.log
+      - name: Verify LWJGL artifacts build into TCL assets
+        run: |
+          set -o pipefail
+          bash ./gradlew :LWJGL:lwjgl-3.3.3:jar :LWJGL:lwjgl-3.4.1:jar --console=plain 2>&1 | tee test-build.log
+          for version in 3.3.3 3.4.1; do
+            test -s "TCL/src/main/assets/app_runtime/lwjgl/$version/lwjgl-$version-merged-modules.jar"
+            test -s "TCL/src/main/assets/app_runtime/lwjgl/$version/version"
+          done
       - name: Report failures
         if: failure()
         run: |
