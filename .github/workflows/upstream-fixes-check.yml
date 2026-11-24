@@ -45,15 +45,7 @@ jobs:
             readelf --dyn-syms -W "$RUNNER_TEMP/shaderc.so" > "$RUNNER_TEMP/shaderc-symbols.txt"
             awk '$8 == "spvSoftwareVersionString" && $7 != "UND" { found=1 } END { exit !found }' "$RUNNER_TEMP/shaderc-symbols.txt"
           done
-      - name: Test account and download fixes
-        run: |
-          set -o pipefail
-          bash ./gradlew :TCL:testDebugUnitTest \
-            --tests 'com.movtery.zalithlauncher.game.account.PassportServerIdTest' \
-            --tests 'com.movtery.zalithlauncher.game.addons.mirror.AssetsSourceOrderTest' \
-            --tests 'com.movtery.zalithlauncher.game.download.engine.FetcherHttpTest' \
-            --console=plain 2>&1 | tee test-build.log
-      - name: Verify LWJGL artifacts build into TCL assets
+      - name: Build LWJGL artifacts with the matching GLFW bindings
         run: |
           set -o pipefail
           bash ./gradlew :LWJGL:lwjgl-3.3.3:jar :LWJGL:lwjgl-3.4.1:jar --console=plain 2>&1 | tee test-build.log
@@ -61,6 +53,26 @@ jobs:
             test -s "TCL/src/main/assets/app_runtime/lwjgl/$version/lwjgl-$version-merged-modules.jar"
             test -s "TCL/src/main/assets/app_runtime/lwjgl/$version/version"
           done
+      - name: Upload matching LWJGL artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lwjgl-components
+          path: |
+            TCL/src/main/assets/app_runtime/lwjgl/3.3.3/lwjgl-3.3.3-merged-modules.jar
+            TCL/src/main/assets/app_runtime/lwjgl/3.3.3/version
+            TCL/src/main/assets/app_runtime/lwjgl/3.4.1/lwjgl-3.4.1-merged-modules.jar
+            TCL/src/main/assets/app_runtime/lwjgl/3.4.1/version
+          if-no-files-found: error
+      - name: Test account, download and GLFW fixes
+        run: |
+          set -o pipefail
+          bash ./gradlew :TCL:testDebugUnitTest \
+            --tests 'com.movtery.zalithlauncher.game.account.PassportServerIdTest' \
+            --tests 'com.movtery.zalithlauncher.game.addons.mirror.AssetsSourceOrderTest' \
+            --tests 'com.movtery.zalithlauncher.game.download.engine.FetcherHttpTest' \
+            --tests 'com.movtery.zalithlauncher.game.input.EventWaitNativeTest' \
+            --tests 'com.movtery.zalithlauncher.game.input.PackagedGlfwEventWaitTest' \
+            --console=plain 2>&1 | tee test-build.log
       - name: Report failures
         if: failure()
         run: |
