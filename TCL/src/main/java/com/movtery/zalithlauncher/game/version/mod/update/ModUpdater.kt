@@ -280,9 +280,7 @@ class ModUpdater(
 
                         //确保所有文件都有效
                         if (modsDir.exists() && oldFile.exists() && cacheFile.exists()) {
-                            FileUtils.deleteQuietly(oldFile)
-                            val newFile = File(modsDir, newFileName)
-                            cacheFile.copyTo(target = newFile, overwrite = true)
+                            replaceUpdatedMod(oldFile, cacheFile, modsDir, newFileName)
                         }
                     }
                 }

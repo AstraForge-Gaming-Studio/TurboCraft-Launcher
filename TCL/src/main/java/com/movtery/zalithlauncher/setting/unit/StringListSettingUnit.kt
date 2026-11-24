@@ -29,7 +29,7 @@ class StringListSettingUnit(
     key = key,
     defaultValue = defaultValue
 ) {
-    override fun getValue(): List<String> {
+    override fun readValue(): List<String> {
         val list = launcherMMKV().decodeParcelable(key, ListParcelable::class.java)
         return (list?.value ?: defaultValue)
             .also { state = it }

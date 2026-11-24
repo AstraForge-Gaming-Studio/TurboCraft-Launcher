@@ -775,6 +775,7 @@
     <string name="game_loading_version_name">Game Version: %s</string>
     <!-- Line on the game launching overlay; %s is extra info about the version being started -->
     <string name="game_loading_version_info">Game Info: %s</string>
+    <string name="game_loading_renderer">Renderer: %s</string>
     <!-- Title of the in-game menu overlay -->
     <string name="game_menu_title">Game Menu</string>
     <!-- Warning message in the dialog confirming force close from the in-game menu -->
@@ -3849,4 +3850,10 @@
     <string name="settings_launcher_animate_extent_summary">Adjust the intensity of the launcher animations</string>
     <string name="settings_launcher_swap_animate_type_title">Transition Animation</string>
     <string name="settings_launcher_swap_animate_type_summary">Choose the page transition animation that best suits your preferences</string>
+    <string name="splash_arch_mismatch_title">This APK does not match your device</string>
+    <string name="splash_arch_mismatch_package_arch">Installed launcher architecture: %s</string>
+    <string name="splash_arch_mismatch_device_arch">Device architecture: %s</string>
+    <string name="splash_arch_mismatch_desc1">The bundled Java runtimes do not match this device and cannot launch the game.</string>
+    <string name="splash_arch_mismatch_desc2">Download the %s or universal APK from the official TurboCraft website and install it over this version.</string>
+    <string name="splash_arch_mismatch_footer">Architecture information comes from the APK and Android system.</string>
 </resources>

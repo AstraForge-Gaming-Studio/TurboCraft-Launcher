@@ -21,7 +21,7 @@ package com.movtery.zalithlauncher.setting.unit
 import com.movtery.zalithlauncher.setting.launcherMMKV
 
 class StringSettingUnit(key: String, defaultValue: String) : AbstractSettingUnit<String>(key, defaultValue) {
-    override fun getValue(): String {
+    override fun readValue(): String {
         return launcherMMKV().getString(key ,defaultValue)!!
             .also { state = it }
     }

@@ -51,44 +51,49 @@ class LaunchGameViewModel : ViewModel() {
         quickPlay: QuickPlay?,
         skipAccountRefresh: Boolean
     ) {
-        _launchFlow.update {
-            GameLaunchFlow(viewModelScope).also {
-                it.launch(
-                    context = activity,
-                    version = version,
-                    exitActivity = exitActivity,
-                    onError = { message ->
+        val flow = GameLaunchFlow(viewModelScope)
+        // Reserve the flow before starting it: completion can happen synchronously.
+        if (!_launchFlow.compareAndSet(null, flow)) return
+        try {
+            flow.launch(
+                context = activity,
+                version = version,
+                exitActivity = exitActivity,
+                onError = { message ->
+                    if (_launchFlow.value === flow) {
                         submitError(message)
-                        cancel()
-                    },
-                    onReloginRequired = { account ->
+                        flow.cancel()
+                    }
+                },
+                onReloginRequired = { account ->
+                    if (_launchFlow.value === flow) {
                         activity.runOnUiThread {
-                            updateOperation(
-                                LaunchGameOperation.AccountRelogin(account, version, quickPlay)
-                            )
+                            updateOperation(LaunchGameOperation.AccountRelogin(account, version, quickPlay))
                         }
-                        cancel()
-                    },
-                    onRefreshFailed = { account, th ->
+                        flow.cancel()
+                    }
+                },
+                onRefreshFailed = { account, th ->
+                    if (_launchFlow.value === flow) {
                         activity.runOnUiThread {
-                            updateOperation(
-                                LaunchGameOperation.AccountRefreshFailed(account, th, version, quickPlay)
-                            )
+                            updateOperation(LaunchGameOperation.AccountRefreshFailed(account, th, version, quickPlay))
                         }
-                        cancel()
-                    },
-                    onComplete = {
-                        _launchFlow.update { null }
-                    },
-                    skipAccountRefresh = skipAccountRefresh
-                )
-            }
+                        flow.cancel()
+                    }
+                },
+                onComplete = { _launchFlow.compareAndSet(flow, null) },
+                onCancelled = { _launchFlow.compareAndSet(flow, null) },
+                skipAccountRefresh = skipAccountRefresh
+            )
+        } catch (error: Throwable) {
+            _launchFlow.compareAndSet(flow, null)
+            throw error
         }
     }
 
     fun cancel() {
+        // Keep the flow reserved until its task and cleanup actually finish.
         _launchFlow.value?.cancel()
-        _launchFlow.update { null }
     }
 
     /**

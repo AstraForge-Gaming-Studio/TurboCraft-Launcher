@@ -59,6 +59,7 @@ class PathManager {
         lateinit var DIR_TERRACOTTA: File
         lateinit var DIR_STYLES: File
         lateinit var DIR_DRIVERS: File
+        lateinit var DIR_FFMPEG_BIN: File
 
         lateinit var FILE_CRASH_REPORT: File
         lateinit var FILE_SETTINGS: File
@@ -105,6 +106,7 @@ class PathManager {
             DIR_TERRACOTTA = File(DIR_FILES_PRIVATE, "net.burningtnt.terracotta")
             DIR_STYLES = File(DIR_FILES_PRIVATE, "special_styles")
             DIR_DRIVERS = File(DIR_GAME, "drivers")
+            DIR_FFMPEG_BIN = File(DIR_FILES_PRIVATE, "ffmpeg_bin")
 
             FILE_CRASH_REPORT = File(DIR_LAUNCHER_LOGS, "launcher_crash.log")
             FILE_SETTINGS = File(DIR_FILES_PRIVATE, "settings.json")
@@ -124,7 +126,7 @@ class PathManager {
                 DIR_CACHE_GAME_DOWNLOADER, DIR_CACHE_MODPACK_DOWNLOADER, DIR_CACHE_MODPACK_EXPORTER,
                 DIR_CACHE_SAVE_EXPORTER, DIR_CACHE_MOD_UPDATER, DIR_CACHE_APP_ICON, DIR_CACHE_HOME_PAGE,
                 DIR_LAUNCHER_LOGS, DIR_NATIVE_LOGS, DIR_IMAGE_CACHE, DIR_CONTROL_LAYOUTS,
-                DIR_TERRACOTTA, DIR_STYLES, DIR_DRIVERS
+                DIR_TERRACOTTA, DIR_STYLES, DIR_DRIVERS, DIR_FFMPEG_BIN
             ).forEach { dir ->
                 if (!dir.exists() && !dir.mkdirs()) {
                     Logger.warning(TAG, "Failed to create directory: ${dir.absolutePath}")

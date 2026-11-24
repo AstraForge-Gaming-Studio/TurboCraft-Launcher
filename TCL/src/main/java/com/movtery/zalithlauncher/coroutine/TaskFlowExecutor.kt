@@ -26,6 +26,7 @@ import com.movtery.zalithlauncher.utils.network.isInterruptedIOException
 import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "TaskFlowExecutor"
 
@@ -68,8 +70,10 @@ class TaskFlowExecutor(
     private val _tasksFlow: MutableStateFlow<List<TitledTask>> = MutableStateFlow(emptyList())
     val tasksFlow = _tasksFlow.asStateFlow()
 
+    @Volatile
     private var job: Job? = null
     /** 当前正在执行的任务的Job */
+    @Volatile
     private var currentTaskJob: Job? = null
     /** 当前任务流阶段索引 */
     private var currentPhaseIndex: Int = -1
@@ -209,16 +213,31 @@ class TaskFlowExecutor(
         onError: (Throwable) -> Unit = {},
         onCancel: () -> Unit = {}
     ) {
-        job = scope.launch(Dispatchers.IO) {
-            //持有保活，避免启动器切至后台后任务流被系统中断
+        // Completion also covers cancellation before the coroutine starts or while onStart runs.
+        // Notify only after task cleanup has finished, so a retry cannot overlap the old flow.
+        val cancelled = AtomicBoolean(false)
+        val flowJob = scope.launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
             TaskKeepAlive.acquire()
             try {
                 onStart()
-                executePhases(onComplete, onError, onCancel)
+                executePhases(onComplete, onError) { cancelled.set(true) }
+            } catch (error: Throwable) {
+                if (error is CancellationException || error.isInterruptedIOException()) {
+                    cancelled.set(true)
+                } else {
+                    onError(error)
+                }
             } finally {
                 TaskKeepAlive.release()
             }
         }
+        job = flowJob
+        flowJob.invokeOnCompletion { cause ->
+            if (cancelled.get() || cause is CancellationException || cause?.isInterruptedIOException() == true) {
+                onCancel()
+            }
+        }
+        flowJob.start()
     }
 
     /**
@@ -243,16 +262,9 @@ class TaskFlowExecutor(
     fun isRunning(): Boolean = job?.isActive == true
 
     fun cancel() {
-        //先取消当前正在执行的任务及其所有子协程
+        // Cleanup stays on the executor coroutine, not on the UI/taskbar thread.
         currentTaskJob?.cancel()
-        currentTaskJob = null
-        
         job?.cancel()
-        job = null
-
-        _tasksFlow.update { emptyList() }
-        clearPublishedTasks()
-        currentPhaseIndex = -1
     }
 }
 

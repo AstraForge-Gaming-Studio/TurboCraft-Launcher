@@ -99,6 +99,7 @@ import com.movtery.zalithlauncher.game.keycodes.mapToControlEvent
 import com.movtery.zalithlauncher.game.keycodes.mapToKeycode
 import com.movtery.zalithlauncher.game.launch.handler.GameHandler
 import com.movtery.zalithlauncher.game.recorder.GameRecorder
+import com.movtery.zalithlauncher.game.renderer.Renderers
 import com.movtery.zalithlauncher.game.recorder.RecordingState
 import com.movtery.zalithlauncher.game.sdl.SdlBridge
 import com.movtery.zalithlauncher.game.sdl.SdlTextSender
@@ -859,12 +860,20 @@ fun GameScreen(
             )
         }
 
+        // GameLauncher selects this renderer when it starts; match its fallback without
+        // changing the user's renderer choice or forcing a graphics API.
+        val rendererName = remember(version) {
+            val renderers = Renderers.getRenderers()
+            (renderers.find { it.getUniqueIdentifier() == version.getRenderer() }
+                ?: renderers.firstOrNull())?.getRendererName()
+        }
         GameInfoBox(
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(all = 16.dp),
             versionName = version.getVersionName(),
             versionInfo = version.getVersionInfo()?.getInfoString(),
+            rendererName = rendererName,
             visible = showGameInfo && !AllSettings.disableLoadingPopup.state,
             onClose = onInfoBoxClose
         )
@@ -1050,6 +1059,7 @@ fun GameScreen(
 private fun GameInfoBox(
     versionName: String,
     versionInfo: String?,
+    rendererName: String?,
     visible: Boolean,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -1096,6 +1106,12 @@ private fun GameInfoBox(
                                 style = MaterialTheme.typography.labelLarge
                             )
                         }
+                        rendererName?.let { renderer ->
+                            Text(
+                                text = stringResource(R.string.game_loading_renderer, renderer),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
                     }
                 }
 
@@ -1121,6 +1137,7 @@ private fun PreviewGameInfoBox() {
         GameInfoBox(
             versionName = "1.21.11",
             versionInfo = "1.21.11",
+            rendererName = "MobileGlues",
             visible = true,
             onClose = {}
         )

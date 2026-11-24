@@ -21,6 +21,8 @@ package com.movtery.zalithlauncher.setting.unit
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.movtery.zalithlauncher.utils.logging.Logger
+import kotlinx.coroutines.CancellationException
 
 abstract class AbstractSettingUnit<V>(
     val key: String,
@@ -29,7 +31,22 @@ abstract class AbstractSettingUnit<V>(
     /**
      * @return 获取当前的设置值
      */
-    abstract fun getValue(): V
+    protected abstract fun readValue(): V
+
+    fun getValue(): V {
+        val value = try {
+            readValue()
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            // A corrupt preference must not prevent the rest of the launcher loading.
+            // Do not overwrite stored data: the user can still recover or reset it.
+            Logger.warning("Settings", "Failed to read setting $key; using its default", error)
+            defaultValue
+        }
+        state = value
+        return value
+    }
 
     /**
      * 保存设置值

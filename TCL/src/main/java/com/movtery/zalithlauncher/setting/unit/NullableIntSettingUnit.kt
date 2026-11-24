@@ -25,7 +25,7 @@ class NullableIntSettingUnit(
     defaultValue: Int?,
     val valueRange: IntRange
 ) : AbstractSettingUnit<Int?>(key, defaultValue) {
-    override fun getValue(): Int? {
+    override fun readValue(): Int? {
         val mmkv = launcherMMKV()
         return if (mmkv.containsKey(key)) {
             mmkv.getInt(key, 0)

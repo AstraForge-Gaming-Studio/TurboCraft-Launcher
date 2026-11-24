@@ -53,6 +53,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
@@ -127,7 +128,9 @@ fun microsoftLogin(
             task.updateMessage(androidText(R.string.account_microsoft_fetch_device_code))
             val deviceCode = fetchDeviceCodeResponse(coroutineContext)
             Logger.debug(TAG, "Device code received, verification url: ${deviceCode.verificationUrl}, expires in ${deviceCode.expiresIn}s")
-            copyText(COPY_LABEL_DEVICE_CODE, deviceCode.userCode, context, false)
+            withContext(Dispatchers.Main) {
+                copyText(COPY_LABEL_DEVICE_CODE, deviceCode.userCode, context, false)
+            }
             showToast(
                 androidText(R.string.account_microsoft_coped_device_code, deviceCode.userCode),
                 Toast.LENGTH_SHORT
@@ -493,6 +496,13 @@ private fun addHttpsIfMissing(baseUrl: String): String {
     return if (!baseUrl.startsWith("http://", true) && !baseUrl.startsWith("https://")) {
         "https://$baseUrl".lowercase(Locale.ROOT)
     } else baseUrl.lowercase(Locale.ROOT)
+}
+
+/**
+ * 从统一通行证服务器URL中截取服务器ID
+ */
+fun getPassportServerId(url: String): String {
+    return url.replace("https://auth.mc-user.com:233/", "").trimEnd('/')
 }
 
 /**

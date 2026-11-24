@@ -95,10 +95,18 @@ open class JvmLauncher(
     ): Pair<Runtime, List<String>> {
         val args = jvmLaunchInfo.jvmArgs.splitPreservingQuotes()
 
-        val runtime = jvmLaunchInfo.jreName?.let { jreName ->
+        val runtime = jvmLaunchInfo.jreName?.takeIf { it.isNotEmpty() }?.let { jreName ->
             RuntimesManager.forceReload(jreName)
         } ?: run {
-            RuntimesManager.forceReload(AllSettings.javaRuntime.getValue())
+            val defaultName = AllSettings.javaRuntime.getValue()
+            val name = if (AllSettings.autoPickJavaRuntime.getValue()) {
+                RuntimesManager.getCompatibleJreName(8)
+                    ?: defaultName.takeIf { RuntimesManager.isRuntimeUsable(it) }
+            } else {
+                defaultName.takeIf { RuntimesManager.isRuntimeUsable(it) }
+                    ?: RuntimesManager.getCompatibleJreName(8)
+            } ?: throw IOException("No available Java runtime environment")
+            RuntimesManager.forceReload(name)
         }
 
         val argList: MutableList<String> = ArrayList(

@@ -91,6 +91,7 @@ class GameLaunchFlow(scope: CoroutineScope) {
         onRefreshFailed: (Account, Throwable) -> Unit = { _, _ -> },
         isRunning: () -> Unit = {},
         onComplete: () -> Unit,
+        onCancelled: () -> Unit = {},
         onError: (ErrorViewModel.ThrowableMessage) -> Unit,
     ) {
         if (taskExecutor.isRunning()) {
@@ -99,7 +100,10 @@ class GameLaunchFlow(scope: CoroutineScope) {
             return
         }
 
-        val account = AccountsManager.currentAccountFlow.value ?: return
+        val account = AccountsManager.currentAccountFlow.value ?: run {
+            onComplete()
+            return
+        }
         var errorReported = false
         val handleError: (ErrorViewModel.ThrowableMessage) -> Unit = { message ->
             if (!errorReported) {
@@ -124,6 +128,7 @@ class GameLaunchFlow(scope: CoroutineScope) {
                 )
             },
             onComplete = onComplete,
+            onCancel = onCancelled,
             onError = { th ->
                 when (th) {
                     is LaunchReloginRequired -> onReloginRequired(th.account)
