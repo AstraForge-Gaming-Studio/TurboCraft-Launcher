@@ -27,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
@@ -89,14 +88,13 @@ fun PetModelView(
     tapReaction: PetTapReaction = PetTapReaction.Squash,
     dragYaw: Boolean = true,
     gazeEnabled: Boolean = true,
-    fallback: @Composable () -> Unit = {},
 ) {
     val context = LocalContext.current
     val petController = remember {
         PetController.create(skin ?: context.loadDefaultSkin(arm), arm)
     }
     if (petController == null) {
-        Box(modifier, contentAlignment = Alignment.Center) { fallback() }
+        Box(modifier)
         return
     }
     DisposableEffect(petController) {
