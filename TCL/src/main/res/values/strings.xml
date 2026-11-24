@@ -3852,4 +3852,10 @@
     <string name="settings_launcher_swap_animate_type_summary">Choose the page transition animation that best suits your preferences</string>
     <string name="main_show_play">Play</string>
     <string name="main_show_dashboard">Dashboard</string>
+    <string name="splash_arch_mismatch_title">This APK does not match your device</string>
+    <string name="splash_arch_mismatch_package_arch">Installed launcher architecture: %s</string>
+    <string name="splash_arch_mismatch_device_arch">Device architecture: %s</string>
+    <string name="splash_arch_mismatch_desc1">The bundled Java runtimes do not match this device and cannot launch the game.</string>
+    <string name="splash_arch_mismatch_desc2">Download the %s or universal APK from the official TurboCraft website and install it over this version.</string>
+    <string name="splash_arch_mismatch_footer">Architecture information comes from the APK and Android system.</string>
 </resources>

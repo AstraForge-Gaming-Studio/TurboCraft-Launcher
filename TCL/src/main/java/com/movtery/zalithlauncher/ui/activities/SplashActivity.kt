@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.movtery.zalithlauncher.BuildKeys
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.SplashException
 import com.movtery.zalithlauncher.chat.EXTRA_OPEN_CHAT
@@ -53,6 +54,7 @@ import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
 import com.movtery.zalithlauncher.ui.theme.backgroundColor
 import com.movtery.zalithlauncher.ui.theme.onBackgroundColor
 import com.movtery.zalithlauncher.ui.theme.showThemed
+import com.movtery.zalithlauncher.utils.device.Architecture
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.viewmodel.SplashBackStackViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -147,6 +149,7 @@ class SplashActivity : BaseAppCompatActivity() {
                             switchScreen(SplashOperation.Loading)
                             checkTasksToMain()
                         },
+                        onExitClick = { finishAffinity() },
                         availableAgreement = availableAgreement,
                         unpackItems = unpackItems,
                         screenViewModel = backStackViewModel
@@ -157,6 +160,10 @@ class SplashActivity : BaseAppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.Main) {
             switchScreen(SplashOperation.Loading)
+            if (!Architecture.isBuildArchCompatible(BuildKeys.BUILD_ARCH, Architecture.getDeviceArchitecture())) {
+                switchScreen(SplashOperation.ArchMismatch)
+                return@launch
+            }
 
             withContext(Dispatchers.IO) {
                 checkAllTask()

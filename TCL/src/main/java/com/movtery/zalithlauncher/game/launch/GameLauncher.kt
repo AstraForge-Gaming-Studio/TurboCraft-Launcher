@@ -41,6 +41,7 @@ import com.movtery.zalithlauncher.game.multirt.RuntimesManager
 import com.movtery.zalithlauncher.game.plugin.Plugin
 import com.movtery.zalithlauncher.game.plugin.driver.DriverPluginManager
 import com.movtery.zalithlauncher.game.plugin.renderer.RendererPluginManager
+import com.movtery.zalithlauncher.game.renderer.applyMesaEnvironment
 import com.movtery.zalithlauncher.game.renderer.ConfigurableRenderer
 import com.movtery.zalithlauncher.game.renderer.Renderers
 import com.movtery.zalithlauncher.game.renderer.config.GlobalRendererConfigStore
@@ -512,16 +513,7 @@ private fun setRendererEnv(
 
     if (RendererPluginManager.selectedRendererPlugin != null) return
 
-    if (!renderer.mesaBased) {
-        envMap["MESA_LOADER_DRIVER_OVERRIDE"] = "zink"
-        envMap["MESA_GLSL_CACHE_DIR"] = PathManager.DIR_CACHE.absolutePath
-        envMap["MESA_GL_VERSION_OVERRIDE"] = "4.6"
-        envMap["MESA_GLSL_VERSION_OVERRIDE"] = "460"
-        envMap["force_glsl_extensions_warn"] = "true"
-        envMap["allow_higher_compat_version"] = "true"
-        envMap["allow_glsl_extension_directive_midshader"] = "true"
-        envMap["LIB_MESA_NAME"] = getRendererLibrary() ?: "null"
-    }
+    applyMesaEnvironment(envMap, renderer, getRendererLibrary(), PathManager.DIR_CACHE.absolutePath)
 
     if (!envMap.containsKey("LIBGL_ES")) {
         val glesMajor = getDetectedVersion()

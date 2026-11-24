@@ -28,7 +28,7 @@ class EnumSettingUnit<E : Enum<E>>(
     defaultValue: E,
     private val getEnum: (String) -> E?
 ) : AbstractSettingUnit<E>(key, defaultValue) {
-    override fun getValue(): E {
+    override fun readValue(): E {
         val valueString: String = launcherMMKV().getString(key, defaultValue.name)!!
         return (getEnum(valueString) ?: defaultValue)
             .also { state = it }
