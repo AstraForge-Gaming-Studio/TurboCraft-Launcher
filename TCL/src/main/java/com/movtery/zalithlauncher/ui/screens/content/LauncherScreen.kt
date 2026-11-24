@@ -992,7 +992,6 @@ private fun ActionMenuContent(
                     .fillMaxWidth()
                     .guideNode(
                         key = GuideKeys.Main.Step.Account,
-                        holeShape = accShape,
                         preferSide = GuideSide.Below
                     ),
                 shape = accShape,
@@ -1016,7 +1015,6 @@ private fun ActionMenuContent(
                     .fillMaxWidth()
                     .guideNode(
                         key = GuideKeys.Main.Step.VersionList,
-                        holeShape = bottomShape,
                         preferSide = GuideSide.Above,
                     ),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
