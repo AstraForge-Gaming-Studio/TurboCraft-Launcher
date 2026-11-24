@@ -37,6 +37,10 @@ jobs:
           sdkmanager --install 'ndk;25.2.9519653' 'cmake;3.22.1'
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
       - uses: gradle/actions/setup-gradle@v5
+      - name: Verify committed LWJGL components
+        run: python3 scripts/check_lwjgl_components.py
+      - name: Verify bundled Java runtime archive sets
+        run: python3 scripts/check_bundled_runtimes.py
       - name: Verify shader compiler SPIR-V symbols on every ABI
         run: |
           set -euo pipefail
