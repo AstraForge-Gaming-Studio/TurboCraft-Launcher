@@ -29,6 +29,14 @@ jobs:
           sdkmanager --install 'ndk;25.2.9519653' 'cmake;3.22.1'
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
       - uses: gradle/actions/setup-gradle@v5
+      - name: Verify shader compiler SPIR-V symbols on every ABI
+        run: |
+          set -euo pipefail
+          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+            unzip -p TCL/libs/lwjgl-3.4.1-natives-release.aar "assets/app_runtime/lwjgl/3.4.1/natives/$abi/libshaderc.so" > "$RUNNER_TEMP/shaderc.so"
+            readelf --dyn-syms -W "$RUNNER_TEMP/shaderc.so" > "$RUNNER_TEMP/shaderc-symbols.txt"
+            awk '$8 == "spvSoftwareVersionString" && $7 != "UND" { found=1 } END { exit !found }' "$RUNNER_TEMP/shaderc-symbols.txt"
+          done
       - name: Test account and download fixes
         run: |
           set -o pipefail
