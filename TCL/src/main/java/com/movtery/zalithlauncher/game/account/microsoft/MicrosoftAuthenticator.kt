@@ -46,14 +46,18 @@ import com.movtery.zalithlauncher.game.account.yggdrasil.findUsing
 import com.movtery.zalithlauncher.game.account.yggdrasil.getPlayerProfile
 import com.movtery.zalithlauncher.game.account.yggdrasil.getSkinModel
 import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
+import com.movtery.zalithlauncher.path.GLOBAL_JSON
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.httpPostJson
 import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
+import com.movtery.zalithlauncher.utils.network.safeBodyAsText
 import com.movtery.zalithlauncher.utils.network.submitForm
 import com.movtery.zalithlauncher.utils.string.toUuidStr
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -67,6 +71,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
@@ -75,6 +80,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
+import io.ktor.client.request.forms.submitForm as submitFormRequest
 
 private const val TAG = "MicrosoftAuth"
 
@@ -137,6 +143,11 @@ suspend fun fetchDeviceCodeResponse(context: CoroutineContext): DeviceCodeRespon
 suspend fun getTokenResponse(
     codeResponse: DeviceCodeResponse,
     context: CoroutineContext,
+    tokenUrl: String = if (USE_LEGACY_LIVE_FLOW) {
+        "$LIVE_AUTH_URL/oauth20_token.srf"
+    } else {
+        "$MICROSOFT_AUTH_URL$TENANT/oauth2/v2.0/token"
+    },
     checkCancelled: suspend (time: Int) -> Boolean
 ): TokenResponse = coroutineScope {
     var pollingInterval = codeResponse.interval * 1000L
@@ -157,45 +168,63 @@ suspend fun getTokenResponse(
         context.ensureActive()
 
         try {
-            val response: JsonObject = submitForm(
-                if (USE_LEGACY_LIVE_FLOW) {
-                    "$LIVE_AUTH_URL/oauth20_token.srf"
-                } else {
-                    "$MICROSOFT_AUTH_URL$TENANT/oauth2/v2.0/token"
-                },
-                parameters = Parameters.build {
-                    append("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
-                    append("device_code", codeResponse.deviceCode)
-                    append("client_id", MICROSOFT_CLIENT_ID)
-                },
-                context = context
-            )
-            consecutiveFailures = 0
-
-            val accessToken = response["access_token"].text()
-            if (accessToken.isNotBlank()) {
-                Logger.debug(TAG, "Access token successfully retrieved")
-                return@coroutineScope TokenResponse(
-                    accessToken = accessToken,
-                    refreshToken = response["refresh_token"].text(),
-                    expiresIn = response["expires_in"]?.jsonPrimitive?.int ?: 0
-                )
+            // OAuth device-code endpoints normally use HTTP 400 for pending/slow_down.
+            // Read the body once with expectSuccess disabled, before Ktor can consume it.
+            val (httpResponse, responseBody) = withContext(context) {
+                val result = GLOBAL_CLIENT.submitFormRequest(
+                    url = tokenUrl,
+                    formParameters = Parameters.build {
+                        append("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
+                        append("device_code", codeResponse.deviceCode)
+                        append("client_id", MICROSOFT_CLIENT_ID)
+                    }
+                ) {
+                    contentType(ContentType.Application.FormUrlEncoded)
+                    expectSuccess = false
+                }
+                result to result.safeBodyAsText()
             }
-            Logger.warning(TAG, "Token endpoint responded without a Bearer token, continuing to poll")
-        } catch (e: ClientRequestException) {
-            when (val error = e.errorCode()) {
-                // 服务器正常响应，说明网络可用
-                "authorization_pending" -> consecutiveFailures = 0 // 正常情况，继续轮询
+            if (httpResponse.status.value >= 500) {
+                throw ServerResponseException(httpResponse, responseBody)
+            }
+            val response = try {
+                GLOBAL_JSON.decodeFromString<JsonObject>(responseBody)
+            } catch (error: Exception) {
+                if (httpResponse.status.value in 400..499) {
+                    throw ClientRequestException(httpResponse, responseBody)
+                }
+                throw error
+            }
+            when (val error = response["error"].text()) {
+                "authorization_pending" -> consecutiveFailures = 0
                 "slow_down" -> {
                     consecutiveFailures = 0
                     pollingInterval += 1000L
                     Logger.debug(TAG, "Slowing down polling to ${pollingInterval}ms")
                 }
                 else -> {
-                    Logger.error(TAG, "Token endpoint rejected the polling request: error = $error", e)
-                    throw e
+                    if (httpResponse.status.value in 400..499) {
+                        Logger.error(TAG, "Token endpoint rejected the polling request: error = $error")
+                        throw ClientRequestException(httpResponse, responseBody)
+                    }
+                    if (httpResponse.status.value !in 200..299) {
+                        throw ResponseException(httpResponse, responseBody)
+                    }
+                    consecutiveFailures = 0
+                    val accessToken = response["access_token"].text()
+                    if (accessToken.isNotBlank()) {
+                        Logger.debug(TAG, "Access token successfully retrieved")
+                        return@coroutineScope TokenResponse(
+                            accessToken = accessToken,
+                            refreshToken = response["refresh_token"].text(),
+                            expiresIn = response["expires_in"]?.jsonPrimitive?.int ?: 0
+                        )
+                    }
+                    Logger.warning(TAG, "Token endpoint responded without an access token, continuing to poll")
                 }
             }
+        } catch (e: ClientRequestException) {
+            throw e
         } catch (e: CancellationException) {
             Logger.debug(TAG, "Authentication cancelled")
             throw e

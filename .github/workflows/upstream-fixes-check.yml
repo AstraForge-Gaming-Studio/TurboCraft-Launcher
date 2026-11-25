@@ -72,6 +72,8 @@ jobs:
           set -o pipefail
           bash ./gradlew :TCL:testDebugUnitTest \
             --tests 'com.movtery.zalithlauncher.game.account.PassportServerIdTest' \
+            --tests 'com.movtery.zalithlauncher.game.account.microsoft.DeviceCodePollingTest' \
+            --tests 'com.movtery.zalithlauncher.game.renderer.config.OrderedChoiceEntryTest' \
             --tests 'com.movtery.zalithlauncher.game.addons.mirror.AssetsSourceOrderTest' \
             --tests 'com.movtery.zalithlauncher.game.download.engine.FetcherHttpTest' \
             --tests 'com.movtery.zalithlauncher.game.input.EventWaitNativeTest' \
