@@ -30,7 +30,7 @@ class DeviceCodePollingTest {
         assertEquals("test-refresh", token.refreshToken)
         assertEquals(3, server.requestCount)
         val request = server.takeRequest()
-        val body = request.body.utf8()
+        val body = requireNotNull(request.body).utf8()
         assertTrue(body.contains("client_id=00000000402b5328"))
         assertTrue(body.contains("device_code=DEVICE"))
     }
