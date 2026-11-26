@@ -17,6 +17,7 @@
  */
 #include <dlfcn.h>
 #include <pthread.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -269,7 +270,7 @@ typedef struct {
     int queuedCount;    /* 已入队未播完的 buffer 数 */
     int chunkBytes;     /* 单块 50ms 的字节数（整帧对齐） */
     int capacityBytes;  /* PLAYBACK_BUFFERS * chunkBytes */
-    int started;
+    _Atomic int started;
     /* 录制 */
     ALCdevice* capture;
     int captureCapacityBytes;
@@ -420,8 +421,8 @@ int DAUDIO_Start(void* id, int isSource) {
     if (!jsound_ctxEnter(&guard)) {
         return FALSE;
     }
+    info->started = 1;
     if (isSource) {
-        info->started = 1;
         jsound_ensurePlaying(info);
     } else {
         p_alcCaptureStart(info->capture);
@@ -436,8 +437,8 @@ int DAUDIO_Stop(void* id, int isSource) {
     if (!jsound_ctxEnter(&guard)) {
         return FALSE;
     }
+    info->started = 0;
     if (isSource) {
-        info->started = 0;
         jsound_dropQueued(info);
     } else {
         p_alcCaptureStop(info->capture);
@@ -508,6 +509,8 @@ int DAUDIO_Read(void* id, char* data, int byteSize) {
     if (byteSize <= 0 || info->frameSize <= 0) {
         return -1;
     }
+    /* A partial frame can never be returned by OpenAL; avoid a zero-progress loop. */
+    byteSize -= byteSize % info->frameSize;
     int read = 0;
     while (read < byteSize) {
         ALCint available = 0;

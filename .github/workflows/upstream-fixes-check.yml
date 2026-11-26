@@ -41,6 +41,8 @@ jobs:
         run: python3 scripts/check_lwjgl_components.py
       - name: Verify bundled Java runtime archive sets
         run: python3 scripts/check_bundled_runtimes.py
+      - name: Test native Java Sound playback and capture behavior
+        run: bash scripts/test_jsound_host.sh
       - name: Verify shader compiler SPIR-V symbols on every ABI
         run: |
           set -euo pipefail
