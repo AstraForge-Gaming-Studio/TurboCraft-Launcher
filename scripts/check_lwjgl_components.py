@@ -15,10 +15,10 @@ for version in ("3.3.3", "3.4.1"):
             if symbol not in glfw:
                 raise ValueError(f"LWJGL {version} missing GLFW event wait symbol {symbol!r}")
         archive.getinfo("org/lwjgl/glfw/GLFW$EventWaitError.class")
-        archive.getinfo("org/lwjgl/openal/jsound/JSoundProvider.class")
-        provider = archive.read("META-INF/services/javax.sound.sampled.spi.MixerProvider")
-        if b"org.lwjgl.openal.jsound.JSoundProvider" not in provider:
-            raise ValueError(f"LWJGL {version} JSound service registration missing")
+        if any(name.startswith("org/lwjgl/openal/jsound/") for name in archive.namelist()):
+            raise ValueError(f"LWJGL {version} still contains the old Java JSound bridge")
+        if "META-INF/services/javax.sound.sampled.spi.MixerProvider" in archive.namelist():
+            raise ValueError(f"LWJGL {version} still registers the old Java JSound provider")
     if not (directory / "version").read_text().strip():
         raise ValueError(f"LWJGL {version} component version is empty")
-    print(f"LWJGL {version}: packaged GLFW and JSound verified")
+    print(f"LWJGL {version}: packaged GLFW verified; native JSound selected")

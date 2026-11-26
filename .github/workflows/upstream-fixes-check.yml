@@ -57,6 +57,7 @@ jobs:
             test -s "TCL/src/main/assets/app_runtime/lwjgl/$version/lwjgl-$version-merged-modules.jar"
             test -s "TCL/src/main/assets/app_runtime/lwjgl/$version/version"
           done
+          python3 scripts/check_lwjgl_components.py
       - name: Upload matching LWJGL artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -74,6 +75,7 @@ jobs:
             --tests 'com.movtery.zalithlauncher.game.account.PassportServerIdTest' \
             --tests 'com.movtery.zalithlauncher.game.account.microsoft.DeviceCodePollingTest' \
             --tests 'com.movtery.zalithlauncher.game.renderer.config.OrderedChoiceEntryTest' \
+            --tests 'com.movtery.zalithlauncher.game.multirt.NativeSoundInstallerTest' \
             --tests 'com.movtery.zalithlauncher.game.addons.mirror.AssetsSourceOrderTest' \
             --tests 'com.movtery.zalithlauncher.game.download.engine.FetcherHttpTest' \
             --tests 'com.movtery.zalithlauncher.game.input.EventWaitNativeTest' \

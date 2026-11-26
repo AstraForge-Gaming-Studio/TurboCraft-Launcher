@@ -143,6 +143,9 @@ abstract class Launcher(
         screenSize: IntSize,
         useLocalLanguage: Boolean = true
     ): Int {
+        // Existing runtimes may predate the native sound backend. Update the
+        // selected runtime before Java can load its sound library.
+        RuntimesManager.prepareNativeSound(runtime)
         ZLNativeInvoker.staticLauncher = this
 
         ZLBridge.setLdLibraryPath(getRuntimeLibraryPath())

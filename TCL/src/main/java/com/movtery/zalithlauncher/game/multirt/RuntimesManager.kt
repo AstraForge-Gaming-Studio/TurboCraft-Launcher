@@ -189,13 +189,18 @@ object RuntimesManager {
         if (targetXawtLib.exists()) targetXawtLib.delete()
         FileUtils.copyFile(localXawtLib, targetXawtLib)
 
-        // 补装 libjsound.so
-        val localJsoundLib = File(PathManager.DIR_NATIVE_LIB, "libjsound.so")
-        if (localJsoundLib.exists()) {
-            val targetJsoundLib = dest.child(libFolder, "libjsound.so")
-            if (targetJsoundLib.exists()) targetJsoundLib.delete()
-            FileUtils.copyFile(localJsoundLib, targetJsoundLib)
-        }
+        prepareNativeSound(runtime)
+    }
+
+    /** Updates already-installed and imported runtimes as well as newly installed ones. */
+    @Throws(IOException::class)
+    suspend fun prepareNativeSound(runtime: Runtime) = withContext(Dispatchers.IO) {
+        installNativeSound(
+            runtimeHome = getRuntimeHome(runtime.name),
+            arch = runtime.arch,
+            isJdk8 = runtime.isJDK8,
+            source = File(PathManager.DIR_NATIVE_LIB, "libjsound.so")
+        )
     }
 
     @Throws(IOException::class)
