@@ -10,4 +10,3 @@
 @media(max-width:380px){.hero-actions{align-items:flex-start;flex-direction:column}.hero-inner,.hero{min-height:810px}.hero-aside{display:none}.hero-meta{flex-wrap:wrap}.section h2{font-size:44px}.release-pill{font-size:8px}.button-primary{min-width:235px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
 
-.ad-slot{display:flex;justify-content:center;align-items:center;min-height:90px;padding:16px 20px;background:#0c130e;overflow:hidden;position:relative;z-index:1}.ad-slot:empty{display:none}
